@@ -1,0 +1,25 @@
+{
+  "name": "GA GEL \u2014 Portal Operasional Terpadu PT Global Energi Lestari",
+  "short_name": "GA GEL",
+  "description": "Portal Operasional General Affair & Site \u2014 PT Global Energi Lestari",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#b45309",
+  "icons": [
+    {
+      "src": "https://gelgroup.co.id/images/logo-gel.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://gelgroup.co.id/images/logo-gel.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
