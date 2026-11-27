@@ -6845,35 +6845,39 @@
       if (!r) return;
       const m = ROMAN_MONTHS[new Date().getMonth()];
       const y = new Date().getFullYear();
-      const suggestedGr = r.noGr || `____/GR/${r.pt || 'GEL'}/${m}/${y}`;
+      const suggestedGr = r.noGr || `${r.pt || 'GEL'}/GA/GR-____/${m}/${y}`;
       openUniversalModal(`
         <div class="space-y-4">
           <div class="flex items-center justify-between border-b pb-2.5">
             <div>
               <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-950 text-[10px] font-black">REKONSILIASI PVR MINGGUAN</span>
-              <h3 class="text-base font-black text-slate-900 mt-0.5">✎ Edit Tanggal, Nomor GR &amp; Status Pembayaran</h3>
+              <h3 class="text-base font-black text-slate-900 mt-0.5">✎ Edit Nomor GR, Tanggal Bayar &amp; Status</h3>
               <p class="text-xs text-slate-500">${escapeHtml(r.pt)} • ${escapeHtml(r.nama)} (${escapeHtml(r.rute)}) — <b>${formatRupiah(r.nominal)}</b></p>
             </div>
             <button type="button" onclick="closeUniversalModal()" class="text-slate-400 hover:text-slate-700 font-bold">✕</button>
           </div>
           <form onsubmit="saveRekapGrStatusEdit(event, '${r.id}')" class="space-y-3.5">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Tanggal Order / Pengajuan *</label>
-                <input type="date" id="editRekapTanggalInput" required value="${escapeHtml(String(r.tanggalOrder || getTodayIso()).slice(0, 10))}" class="w-full h-10 px-3 text-xs border border-slate-300 rounded-xl bg-white font-semibold" />
+                <label class="block text-xs font-bold text-slate-700 mb-1">Tanggal Order *</label>
+                <input type="date" id="editRekapTanggalOrderInput" required value="${escapeHtml(String(r.tanggalOrder || getTodayIso()).slice(0, 10))}" class="w-full h-10 px-3 text-xs border border-slate-300 rounded-xl bg-white font-semibold" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-emerald-800 mb-1">Tanggal Bayar (Tgl Bayar)</label>
+                <input type="date" id="editRekapPaidDateInput" value="${escapeHtml(String(r.paidDate || getTodayIso()).slice(0, 10))}" class="w-full h-10 px-3 text-xs border border-emerald-300 rounded-xl bg-emerald-50/40 font-semibold" />
               </div>
               <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">Status Pembayaran *</label>
                 <select id="editRekapStatusBayarSelect" class="w-full h-10 px-3 text-xs border border-slate-300 rounded-xl bg-white font-extrabold">
                   <option value="UNPAID" ${r.statusBayar !== 'PAID' ? 'selected' : ''}>UNPAID (Wajib Buka PVR)</option>
-                  <option value="PAID" ${r.statusBayar === 'PAID' ? 'selected' : ''}>PAID (Lunas — Tidak Perlu Buka PVR Lagi)</option>
+                  <option value="PAID" ${r.statusBayar === 'PAID' ? 'selected' : ''}>PAID (Selesai PAID / Terkunci)</option>
                 </select>
               </div>
             </div>
             <div>
               <div class="flex items-center justify-between mb-1">
                 <label class="block text-xs font-bold text-slate-700">Nomor GR / PVR *</label>
-                <button type="button" onclick="setElVal('editRekapNoGrInput', '____/GR/${escapeHtml(r.pt || 'GEL')}/${m}/${y}')" class="text-[11px] font-extrabold text-blue-600 hover:underline">+ Pakai Template GR (${escapeHtml(r.pt || 'GEL')})</button>
+                <button type="button" onclick="setElVal('editRekapNoGrInput', '${escapeHtml(r.pt || 'GEL')}/GA/GR-____/${m}/${y}')" class="text-[11px] font-extrabold text-blue-600 hover:underline">+ Pakai Template GR (${escapeHtml(r.pt || 'GEL')})</button>
               </div>
               <input type="text" id="editRekapNoGrInput" value="${escapeHtml(r.noGr || '')}" placeholder="${escapeHtml(suggestedGr)}" class="w-full h-10 px-3 text-xs border border-blue-300 rounded-xl bg-blue-50/40 font-mono font-black text-blue-950" />
             </div>
@@ -6883,7 +6887,7 @@
             </div>
             <label class="flex items-center gap-2 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-xs font-bold text-amber-950 cursor-pointer">
               <input type="checkbox" id="editRekapApplySamePtUnpaid" class="w-4 h-4 accent-amber-600 rounded" />
-              <span>Terapkan Nomor GR &amp; Status ini ke semua item <b>UNPAID</b> milik <b>${escapeHtml(r.pt)}</b> yang sedang dicentang</span>
+              <span>Terapkan Nomor GR, Tgl Bayar &amp; Status ini ke semua item <b>UNPAID</b> milik <b>${escapeHtml(r.pt)}</b> yang sedang dicentang</span>
             </label>
             <div class="flex justify-end gap-2 pt-2">
               <button type="button" onclick="closeUniversalModal()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold">Batal</button>
@@ -6898,19 +6902,23 @@
       e.preventDefault();
       const r = records.find(x => x.id === recId);
       if (!r) return;
-      const newDate = getElVal('editRekapTanggalInput', r.tanggalOrder);
+      const newOrderDate = getElVal('editRekapTanggalOrderInput', r.tanggalOrder);
+      const newPaidDate = getElVal('editRekapPaidDateInput', getTodayIso());
       const newStatus = getElVal('editRekapStatusBayarSelect', 'UNPAID');
       const newGr = getElVal('editRekapNoGrInput', '').trim().toUpperCase();
       const newKet = getElVal('editRekapKetInput', '').trim();
       const applyChecked = Boolean(getEl('editRekapApplySamePtUnpaid')?.checked);
 
       const updateOne = (item) => {
-        item.tanggalOrder = newDate;
+        item.tanggalOrder = newOrderDate;
         item.statusBayar = newStatus;
         item.noGr = newGr;
         item.statusKet = newKet;
         if (newStatus === 'PAID') {
+          item.paidDate = newPaidDate || getTodayIso();
           selectedPvrRecordIds.delete(item.id);
+        } else {
+          item.paidDate = '';
         }
         item._updatedAt = Date.now();
       };
@@ -6930,10 +6938,25 @@
       renderPvrPreview(false);
       showToast(
         newStatus === 'PAID'
-          ? `Status diperbarui ke PAID (No. GR: ${newGr || '-'}) — tidak perlu dibuka PVR lagi.`
+          ? `Status diperbarui ke PAID (Tgl: ${formatDateShort(newPaidDate)}, No. GR: ${newGr || '-'}) — terkunci dari PVR.`
           : `Data Tanggal & No. GR (${newGr || '-'}) berhasil diperbarui.`,
         'success'
       );
+    }
+
+    function openSingleItemInPvr(recId) {
+      const r = records.find(x => x.id === recId);
+      if (!r) return;
+      if (r.statusBayar === 'PAID') {
+        showToast('Item ini sudah PAID (Terkunci) — tidak perlu dibuka PVR lagi.', 'info');
+        return;
+      }
+      selectedPvrRecordIds.clear();
+      selectedPvrRecordIds.add(r.id);
+      setElVal('pvrPtSelect', r.pt);
+      setElVal('pvrStatusFilter', 'UNPAID');
+      pvrFilterBySelectionOnly = true;
+      switchMainTab('pvr');
     }
 
     function renderRekapTable() {
@@ -6950,7 +6973,7 @@
       const fBulan = getElVal('filterBulan', 'ALL');
       const fExact = getElVal('filterTanggalExact', '');
 
-      // Bersihkan ID yang sudah PAID dari pilihan PVR agar yang sudah PAID tidak dibuka PVR lagi
+      // Bersihkan ID yang sudah PAID dari pilihan PVR
       records.forEach(r => {
         if (r.statusBayar === 'PAID') selectedPvrRecordIds.delete(r.id);
       });
@@ -6973,62 +6996,114 @@
       setElText('rekapFilteredTotal', formatRupiah(totalFiltered));
       setElText('selectedUnpaidCountBadge', selectedPvrRecordIds.size);
 
+      // Kartu Rekonsiliasi per PT (Persis seperti tampilan referensi: Kartu Putih untuk UNPAID & Kartu Hijau Terkunci untuk PAID)
       const cardsBox = getEl('pvrReconcileCards');
       if (cardsBox) {
-        const unpaidByPt = {};
-        const countByPt = {};
-        records.filter(r => r.statusBayar !== 'PAID').forEach(r => {
-          unpaidByPt[r.pt] = (unpaidByPt[r.pt] || 0) + (Number(r.nominal) || 0);
-          countByPt[r.pt] = (countByPt[r.pt] || 0) + 1;
+        const ptSummary = {};
+        records.forEach(r => {
+          const pt = r.pt || 'GEL';
+          if (!ptSummary[pt]) {
+            ptSummary[pt] = { pt, unpaidTotal: 0, unpaidCount: 0, paidTotal: 0, paidCount: 0 };
+          }
+          const nom = Number(r.nominal) || 0;
+          if (r.statusBayar === 'PAID') {
+            ptSummary[pt].paidTotal += nom;
+            ptSummary[pt].paidCount += 1;
+          } else {
+            ptSummary[pt].unpaidTotal += nom;
+            ptSummary[pt].unpaidCount += 1;
+          }
         });
-        const ptKeys = Object.keys(unpaidByPt).sort();
-        cardsBox.innerHTML = ptKeys.map(pt => `
-          <div onclick="openPtWeeklyPvrFromCard('${pt}')" class="p-3 rounded-xl bg-white border border-blue-200 hover:border-blue-600 cursor-pointer shadow-2xs transition">
-            <div class="flex items-center justify-between">
-              <span class="text-[11px] font-black text-blue-950">${pt}</span>
-              <span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[9.5px] font-extrabold">${countByPt[pt]} Item Wajib PVR</span>
+
+        const ptList = Object.values(ptSummary);
+        cardsBox.innerHTML = ptList.map(info => {
+          const fullName = PT_FULL_INFO[info.pt]?.fullName || `PT. ${info.pt}`;
+          if (info.unpaidCount > 0) {
+            return `
+              <div class="p-3.5 rounded-2xl bg-white border border-blue-200 shadow-2xs flex items-center justify-between gap-2">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-xs font-black text-slate-900">${escapeHtml(info.pt)}</span>
+                    <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[9.5px] font-extrabold">${info.unpaidCount} UNPAID</span>
+                  </div>
+                  <div class="text-[10px] text-slate-500 truncate mt-0.5">${escapeHtml(fullName)}</div>
+                  <div class="text-sm font-black text-blue-700 mt-1">${formatRupiah(info.unpaidTotal)}</div>
+                </div>
+                <button type="button" onclick="openPtWeeklyPvrFromCard('${escapeHtml(info.pt)}')" class="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-extrabold shadow-xs shrink-0 transition">
+                  Buka PVR (${info.unpaidCount})
+                </button>
+              </div>
+            `;
+          }
+          return `
+            <div class="p-3.5 rounded-2xl bg-emerald-50/75 border border-emerald-200 shadow-2xs flex items-center justify-between gap-2">
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs font-black text-slate-900">${escapeHtml(info.pt)}</span>
+                  <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9.5px] font-extrabold">${info.paidCount} PAID</span>
+                </div>
+                <div class="text-[10px] text-slate-500 truncate mt-0.5">${escapeHtml(fullName)}</div>
+                <div class="text-sm font-black text-emerald-700 mt-1">${formatRupiah(info.paidTotal)}</div>
+              </div>
+              <span class="px-3 py-1.5 rounded-xl bg-emerald-100/90 text-emerald-800 border border-emerald-300 text-[11px] font-extrabold shrink-0">
+                ✓ PAID (Terkunci)
+              </span>
             </div>
-            <div class="text-sm font-black text-rose-700 mt-1">${formatRupiah(unpaidByPt[pt])}</div>
-            <div class="text-[10px] text-blue-600 font-bold mt-0.5">Klik untuk buka &amp; pilih item PVR →</div>
-          </div>
-        `).join('') || `<div class="col-span-4 text-xs text-emerald-700 font-bold italic">✓ Semua pengajuan sudah PAID (Tidak ada antrian PVR minggu ini).</div>`;
+          `;
+        }).join('') || `<div class="col-span-4 text-xs text-slate-500 italic">Belum ada data transaksi.</div>`;
       }
 
       tbody.innerHTML = filtered.map((r, i) => {
         const isUnpaid = r.statusBayar !== 'PAID';
         const checked = isUnpaid && selectedPvrRecordIds.has(r.id) ? 'checked' : '';
+        const paidDateLabel = r.paidDate ? formatDateShort(r.paidDate) : formatDateShort(r.tanggalOrder);
         return `
-          <tr class="hover:bg-slate-50 ${isUnpaid ? '' : 'bg-emerald-50/25'}">
-            <td class="py-2.5 px-2.5 text-center">
+          <tr class="hover:bg-slate-50/90">
+            <td class="py-3 px-2.5 text-center align-middle">
               ${isUnpaid
-                ? `<input type="checkbox" ${checked} onchange="if(this.checked)selectedPvrRecordIds.add('${r.id}');else selectedPvrRecordIds.delete('${r.id}');setElText('selectedUnpaidCountBadge',selectedPvrRecordIds.size);" title="Pilih item UNPAID ini untuk diajukan PVR mingguan" class="w-4 h-4 accent-blue-600 rounded cursor-pointer" />`
-                : `<span title="Sudah PAID — Tidak perlu dibuka PVR lagi" class="text-emerald-600 font-black text-xs">✓</span>`
+                ? `<input type="checkbox" ${checked} onchange="if(this.checked)selectedPvrRecordIds.add('${r.id}');else selectedPvrRecordIds.delete('${r.id}');setElText('selectedUnpaidCountBadge',selectedPvrRecordIds.size);" title="Pilih item UNPAID ini untuk PVR" class="w-4 h-4 accent-blue-600 rounded cursor-pointer" />`
+                : `<span title="Sudah PAID — Terkunci" class="text-emerald-600 font-black text-sm">✓</span>`
               }
             </td>
-            <td class="py-2.5 px-3 text-center font-bold">${i + 1}</td>
-            <td class="py-2.5 px-3 whitespace-nowrap">${formatDateShort(r.tanggalOrder)}</td>
-            <td class="py-2.5 px-3 font-mono font-bold">${escapeHtml(r.invoice)}</td>
-            <td class="py-2.5 px-3 font-black text-blue-900">${escapeHtml(r.pt)} <span class="text-[10px] text-slate-500">(${escapeHtml(r.divisi || 'GA')})</span></td>
-            <td class="py-2.5 px-3 font-bold">${escapeHtml(r.nama)}</td>
-            <td class="py-2.5 px-3">${escapeHtml(r.keperluan)}</td>
-            <td class="py-2.5 px-3"><b>${escapeHtml(r.maskapaiHotel)}</b><div class="text-[10px] text-slate-500">${escapeHtml(r.rute)}</div></td>
-            <td class="py-2.5 px-3 whitespace-nowrap">${formatDateShort(r.departDate)}</td>
-            <td class="py-2.5 px-3 text-[11px]">${escapeHtml(r.vendor)}<div class="text-slate-500">${escapeHtml(r.payment)}</div></td>
-            <td class="py-2.5 px-3 text-right font-black">${formatRupiah(r.nominal)}</td>
-            <td class="py-2.5 px-3 font-mono text-[11px]">
-              <button type="button" onclick="openEditRekapGrStatusModal('${r.id}')" class="text-left hover:underline font-bold ${r.noGr ? 'text-blue-900' : 'text-slate-400 italic'}" title="Klik untuk edit Tanggal & Nomor GR">
-                ${escapeHtml(r.noGr || '+ Isi No. GR')}
+            <td class="py-3 px-3 text-center font-bold align-middle">${i + 1}</td>
+            <td class="py-3 px-3 whitespace-nowrap align-middle">${formatDateShort(r.tanggalOrder)}</td>
+            <td class="py-3 px-3 font-mono font-bold align-middle">${escapeHtml(r.invoice)}</td>
+            <td class="py-3 px-3 align-middle">
+              <span class="font-black text-slate-900">${escapeHtml(r.pt)}</span>
+              <span class="text-[10px] font-bold text-slate-500">(${escapeHtml(r.divisi || 'GA')})</span>
+            </td>
+            <td class="py-3 px-3 font-extrabold text-slate-900 align-middle">${escapeHtml(r.nama)}</td>
+            <td class="py-3 px-3 align-middle">${escapeHtml(r.keperluan)}</td>
+            <td class="py-3 px-3 align-middle">
+              <div>${escapeHtml(r.maskapaiHotel)} • <b class="font-extrabold text-slate-900">${escapeHtml(r.rute)}</b></div>
+            </td>
+            <td class="py-3 px-3 whitespace-nowrap align-middle">${formatDateShort(r.departDate)}</td>
+            <td class="py-3 px-3 text-[11px] align-middle">
+              <div>${escapeHtml(r.vendor)} • <b class="font-bold text-slate-800">${escapeHtml(r.payment)}</b></div>
+            </td>
+            <td class="py-3 px-3 text-right font-black text-blue-900 align-middle whitespace-nowrap">${formatRupiah(r.nominal)}</td>
+            <td class="py-3 px-3 align-middle">
+              <div class="font-mono text-[11px] font-bold text-slate-800">${escapeHtml(r.noGr || '-')}</div>
+              <button type="button" onclick="openEditRekapGrStatusModal('${r.id}')" class="text-[10.5px] font-extrabold text-blue-600 hover:underline mt-0.5 block">
+                + Edit GR / Tgl Bayar
               </button>
             </td>
-            <td class="py-2.5 px-3 text-center">
-              <button type="button" onclick="openEditRekapGrStatusModal('${r.id}')" class="px-2.5 py-1 rounded-full text-[10px] font-black cursor-pointer transition ${isUnpaid ? 'bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300' : 'bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-300'}" title="Klik untuk edit Tanggal, No. GR & ubah UNPAID ↔ PAID">
-                ${isUnpaid ? 'UNPAID • Wajib PVR' : 'PAID • Selesai PVR'}
-              </button>
+            <td class="py-3 px-3 text-center align-middle">
+              ${isUnpaid
+                ? `<button type="button" onclick="openEditRekapGrStatusModal('${r.id}')" class="px-3 py-1 rounded-full bg-amber-100 hover:bg-amber-200 text-amber-800 border border-amber-300 text-[10.5px] font-extrabold transition">UNPAID</button>`
+                : `<div class="flex flex-col items-center">
+                     <button type="button" onclick="openEditRekapGrStatusModal('${r.id}')" class="px-3 py-0.5 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-300 text-[10.5px] font-extrabold transition">PAID</button>
+                     <span class="text-[10px] font-bold text-emerald-700 mt-1 whitespace-nowrap">Tgl: ${paidDateLabel}</span>
+                   </div>`
+              }
             </td>
-            <td class="py-2.5 px-3 text-center whitespace-nowrap">
-              <div class="flex items-center justify-center gap-1">
-                <button type="button" onclick="openEditRekapGrStatusModal('${r.id}')" class="px-2 py-1 rounded bg-amber-100 hover:bg-amber-200 text-amber-950 text-[10px] font-extrabold" title="Edit Tanggal, No. GR & Status PAID/UNPAID">✎ GR/Status</button>
-                <button type="button" onclick="markEntityDeleted('${r.id}');records=records.filter(x=>x.id!=='${r.id}');saveStorage();renderRekapTable();" class="px-2 py-1 rounded bg-rose-100 hover:bg-rose-200 text-rose-800 text-[10px] font-bold">Hapus</button>
+            <td class="py-3 px-3 text-center align-middle whitespace-nowrap">
+              <div class="flex items-center justify-center gap-1.5">
+                ${isUnpaid
+                  ? `<button type="button" onclick="openSingleItemInPvr('${r.id}')" class="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10.5px] font-extrabold shadow-2xs transition">Buka PVR</button>`
+                  : `<span class="px-2.5 py-1.5 rounded-lg bg-slate-100 text-slate-500 border border-slate-200 text-[10.5px] font-extrabold">Selesai PAID</span>`
+                }
+                <button type="button" onclick="markEntityDeleted('${r.id}');records=records.filter(x=>x.id!=='${r.id}');saveStorage();renderRekapTable();" class="px-2.5 py-1.5 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 text-[10.5px] font-extrabold transition">Hapus</button>
               </div>
             </td>
           </tr>
@@ -7107,7 +7182,6 @@
       if (!getElVal('pvrSignReviewer')) setElVal('pvrSignReviewer', 'Eunike Priskila');
       if (!getElVal('pvrSignApprover')) setElVal('pvrSignApprover', 'Tony');
 
-      // Item yang sudah PAID tidak perlu dibuka PVR lagi kecuali user secara eksplisit memilih arsip PAID
       const ptItems = records.filter(r =>
         r.pt === pt &&
         (vFilter === 'ALL' || r.vendor === vFilter) &&
@@ -7230,8 +7304,8 @@
       records.forEach(r => {
         if (r.pt === pt && r.statusBayar !== 'PAID' && (!pvrFilterBySelectionOnly || selectedPvrRecordIds.has(r.id))) {
           r.statusBayar = 'PAID';
+          r.paidDate = tglPengajuan;
           if (noPvrDoc && !r.noGr) r.noGr = noPvrDoc;
-          if (tglPengajuan) r.tanggalOrder = tglPengajuan;
           r._updatedAt = Date.now();
           selectedPvrRecordIds.delete(r.id);
           count++;
@@ -7240,7 +7314,7 @@
       saveStorage();
       renderRekapTable();
       renderPvrPreview(false);
-      showToast(`${count} item PVR PT ${pt} ditandai PAID — otomatis keluar dari antrian PVR berikutnya.`, 'success');
+      showToast(`${count} item PVR PT ${pt} ditandai PAID — terkunci dari antrian PVR berikutnya.`, 'success');
     }
 
     // =========================================================================
