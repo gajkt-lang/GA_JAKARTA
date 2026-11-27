@@ -1985,21 +1985,32 @@
                   </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 pt-1">
                   <div class="p-3 rounded-2xl border-2 border-dashed border-slate-300 bg-white flex items-center justify-between gap-2">
                     <div class="min-w-0">
                       <div class="text-xs font-extrabold text-slate-900">📄 Lampiran PDF PO</div>
                       <div id="lvPoFileLabel" class="text-[11px] text-slate-500 truncate">Belum ada file PDF PO</div>
                     </div>
                     <label class="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-extrabold cursor-pointer shrink-0">
-                      Upload PDF
+                      Upload PO
                       <input type="file" id="lvPoPdfInput" accept="application/pdf,.pdf" onchange="handleSewaAttachmentSelect('po', this.files)" class="hidden" />
+                    </label>
+                  </div>
+
+                  <div class="p-3 rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50/30 flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                      <div class="text-xs font-extrabold text-amber-950">📜 Lampiran PDF Kontrak</div>
+                      <div id="lvKontrakFileLabel" class="text-[11px] text-slate-500 truncate">Belum ada file PDF Kontrak</div>
+                    </div>
+                    <label class="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-extrabold cursor-pointer shrink-0">
+                      Upload Kontrak
+                      <input type="file" id="lvKontrakPdfInput" accept="application/pdf,.pdf" onchange="handleSewaAttachmentSelect('kontrak', this.files)" class="hidden" />
                     </label>
                   </div>
 
                   <div class="p-3 rounded-2xl border-2 border-dashed border-slate-300 bg-white flex items-center justify-between gap-2">
                     <div class="min-w-0">
-                      <div class="text-xs font-extrabold text-slate-900">📑 Lampiran Berita Acara (PDF)</div>
+                      <div class="text-xs font-extrabold text-slate-900">📑 Lampiran Berita Acara</div>
                       <div id="lvBaFileLabel" class="text-[11px] text-slate-500 truncate">Belum ada PDF Berita Acara</div>
                     </div>
                     <label class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-extrabold cursor-pointer shrink-0">
@@ -2012,7 +2023,7 @@
                     <div class="flex items-center gap-2 min-w-0">
                       <img id="lvPhotoPreview" src="" alt="Unit" class="hidden w-10 h-10 rounded-lg object-cover border border-slate-300 shrink-0" />
                       <div class="min-w-0">
-                        <div class="text-xs font-extrabold text-slate-900">🚙 Gambar Kendaraan / Bangunan</div>
+                        <div class="text-xs font-extrabold text-slate-900">🚙 Gambar Kendaraan / Unit</div>
                         <div id="lvPhotoFileLabel" class="text-[11px] text-slate-500 truncate">Belum ada foto unit</div>
                       </div>
                     </div>
@@ -2072,7 +2083,7 @@
                         <th class="py-3 px-3 text-right">PPh 23</th>
                         <th class="py-3 px-3 text-right">Grand Total</th>
                         <th class="py-3 px-3">User / Site</th>
-                        <th class="py-3 px-3">Lampiran (PO / BA / Foto)</th>
+                        <th class="py-3 px-3">Lampiran (PO / Kontrak / BA / Foto — Klik Preview)</th>
                         <th class="py-3 px-3">Status Kontrak</th>
                         <th class="py-3 px-3 text-center">Aksi</th>
                       </tr>
@@ -2332,15 +2343,50 @@
                   </div>
                 </div>
 
-                <div class="p-3.5 rounded-2xl border-2 border-dashed border-slate-300 bg-white flex flex-wrap items-center justify-between gap-3">
-                  <div class="min-w-0">
-                    <div class="text-xs font-black text-slate-900">📄 Upload PDF PO Baru / Berita Acara Penggantian Unit</div>
-                    <div id="gpPdfDocLabel" class="text-[11px] font-bold text-slate-500 truncate">Belum ada file PDF PO Baru / BA diunggah</div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div class="p-3 rounded-2xl border-2 border-dashed border-rose-300 bg-rose-50/30 flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                      <div class="text-xs font-black text-rose-950">📄 PDF PO Lama</div>
+                      <div id="gpPoLamaPdfLabel" class="text-[11px] font-semibold text-slate-500 truncate">Belum diunggah</div>
+                    </div>
+                    <label class="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-extrabold cursor-pointer shrink-0">
+                      Upload
+                      <input type="file" id="gpPoLamaPdfInput" accept="application/pdf,.pdf" onchange="handlePerubahanPoMultiSelect('poLama', this.files)" class="hidden" />
+                    </label>
                   </div>
-                  <label class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black cursor-pointer shadow-xs">
-                    📁 Pilih PDF PO Baru / BA
-                    <input type="file" id="gpPdfDocInput" accept="application/pdf,.pdf" onchange="handlePerubahanPoPdfSelect(this.files)" class="hidden" />
-                  </label>
+
+                  <div class="p-3 rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50/30 flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                      <div class="text-xs font-black text-amber-950">📜 PDF Kontrak Lama</div>
+                      <div id="gpKontrakLamaPdfLabel" class="text-[11px] font-semibold text-slate-500 truncate">Belum diunggah</div>
+                    </div>
+                    <label class="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-extrabold cursor-pointer shrink-0">
+                      Upload
+                      <input type="file" id="gpKontrakLamaPdfInput" accept="application/pdf,.pdf" onchange="handlePerubahanPoMultiSelect('kontrakLama', this.files)" class="hidden" />
+                    </label>
+                  </div>
+
+                  <div class="p-3 rounded-2xl border-2 border-dashed border-emerald-300 bg-emerald-50/30 flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                      <div class="text-xs font-black text-emerald-950">📄 PDF PO Baru / BA</div>
+                      <div id="gpPdfDocLabel" class="text-[11px] font-semibold text-slate-500 truncate">Belum diunggah</div>
+                    </div>
+                    <label class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-extrabold cursor-pointer shrink-0">
+                      Upload
+                      <input type="file" id="gpPdfDocInput" accept="application/pdf,.pdf" onchange="handlePerubahanPoMultiSelect('poBaru', this.files)" class="hidden" />
+                    </label>
+                  </div>
+
+                  <div class="p-3 rounded-2xl border-2 border-dashed border-blue-300 bg-blue-50/30 flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                      <div class="text-xs font-black text-blue-950">📜 PDF Kontrak Baru</div>
+                      <div id="gpKontrakBaruPdfLabel" class="text-[11px] font-semibold text-slate-500 truncate">Belum diunggah</div>
+                    </div>
+                    <label class="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-extrabold cursor-pointer shrink-0">
+                      Upload
+                      <input type="file" id="gpKontrakBaruPdfInput" accept="application/pdf,.pdf" onchange="handlePerubahanPoMultiSelect('kontrakBaru', this.files)" class="hidden" />
+                    </label>
+                  </div>
                 </div>
 
                 <div class="flex justify-end gap-2">
@@ -2474,9 +2520,9 @@
     let currentKtpPhotoData = '';
     let currentKtpFaceData = '';
     let currentStnkPhotoData = '';
-    let currentSewaAttachments = { poPdf: '', poName: '', baPdf: '', baName: '', photo: '', photoName: '' };
+    let currentSewaAttachments = { poPdf: '', poName: '', kontrakPdf: '', kontrakName: '', baPdf: '', baName: '', photo: '', photoName: '' };
     let currentPengajuanKontrakPdf = { dataUrl: '', fileName: '' };
-    let currentPerubahanPoPdf = { dataUrl: '', fileName: '' };
+    let currentPerubahanPoPdf = { poLamaPdf: '', poLamaName: '', kontrakLamaPdf: '', kontrakLamaName: '', dataUrl: '', fileName: '', kontrakBaruPdf: '', kontrakBaruName: '' };
     let ctDraftMealPhotos = { pagi: [], siang: [], malam: [], tengahMalam: [] };
     let ctDashboardPeriod = 'DAILY';
     let ctDashboardDate = new Date().toISOString().slice(0, 10);
@@ -3347,7 +3393,7 @@
       const stripHeavyAttachments = (arr, fields) => (Array.isArray(arr) ? arr : []).map(item => {
         const clone = { ...item };
         fields.forEach(f => {
-          if (typeof clone[f] === 'string' && clone[f].length > 150000) {
+          if (typeof clone[f] === 'string' && clone[f].length > 900000) {
             clone[f] = '';
             clone.pdfOversizedLocalOnly = true;
           }
@@ -3371,9 +3417,9 @@
         ptCustomLogos,
         opsGelRecords,
         stnkRecords: stripHeavyAttachments(stnkRecords, ['photo']),
-        sewaLvRecords: stripHeavyAttachments(sewaLvRecords, ['poPdf', 'baPdf', 'photo']),
+        sewaLvRecords: stripHeavyAttachments(sewaLvRecords, ['poPdf', 'kontrakPdf', 'baPdf', 'photo']),
         pengajuanSewaRecords: stripHeavyAttachments(pengajuanSewaRecords, ['kontrakPdf']),
-        perubahanPoRecords: stripHeavyAttachments(perubahanPoRecords, ['pdfDoc']),
+        perubahanPoRecords: stripHeavyAttachments(perubahanPoRecords, ['poLamaPdf', 'kontrakLamaPdf', 'pdfDoc', 'kontrakBaruPdf']),
         ktpRecords: stripHeavyAttachments(ktpRecords, ['photo']),
         siteAccessDirectory,
         pvrStateByPt,
@@ -3854,8 +3900,72 @@
     }
 
     // =========================================================================
-    // MODUL 4: SEWA KENDARAAN, ALAT & BANGUNAN
+    // MODUL 4: SEWA KENDARAAN, ALAT & BANGUNAN (PREVIEW & DOWNLOAD PDF/KONTRAK/FOTO)
     // =========================================================================
+    function openAttachmentViewerModal(title, dataUrl, fileName = 'dokumen') {
+      if (!dataUrl) {
+        showToast('File lampiran belum tersedia atau ukurannya terlalu besar untuk sinkronisasi cloud (maks ~650 KB).', 'warning');
+        return;
+      }
+      const isImage = dataUrl.startsWith('data:image/') || /\.(png|jpe?g|webp|gif)$/i.test(fileName);
+      const safeFile = fileName || (isImage ? 'gambar_unit.jpg' : 'dokumen_lampiran.pdf');
+      openUniversalModal(`
+        <div class="space-y-3.5">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-2.5">
+            <div class="min-w-0">
+              <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-950 text-[10px] font-black uppercase">PREVIEW &amp; DOWNLOAD LAMPIRAN</span>
+              <h3 class="text-sm sm:text-base font-black text-slate-900 mt-0.5 truncate">${escapeHtml(title)}</h3>
+              <p class="text-[11px] text-slate-500 truncate">${escapeHtml(safeFile)}</p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <a href="${dataUrl}" download="${escapeHtml(safeFile)}" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow-xs">
+                ⬇ Download File
+              </a>
+              <button type="button" onclick="closeUniversalModal()" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">✕ Tutup</button>
+            </div>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-slate-100 overflow-hidden flex items-center justify-center min-h-[360px] max-h-[70vh]">
+            ${isImage
+              ? `<img src="${dataUrl}" alt="${escapeHtml(title)}" class="max-h-[68vh] w-auto object-contain" />`
+              : `<iframe src="${dataUrl}" class="w-full h-[68vh] border-0 bg-white"></iframe>`
+            }
+          </div>
+        </div>
+      `);
+    }
+
+    function previewSewaLvAttachment(recId, kind) {
+      const r = sewaLvRecords.find(x => x.id === recId);
+      if (!r) return;
+      const map = {
+        po: { url: r.poPdf, name: r.poName || `PO_${r.noPo || 'Sewa'}.pdf`, label: `PDF PO — ${r.noPo}` },
+        kontrak: { url: r.kontrakPdf, name: r.kontrakName || `Kontrak_${r.noPo || 'Sewa'}.pdf`, label: `PDF Kontrak — ${r.noPo}` },
+        ba: { url: r.baPdf, name: r.baName || `Berita_Acara_${r.noPo || 'Sewa'}.pdf`, label: `PDF Berita Acara — ${r.noPo}` },
+        photo: { url: r.photo, name: r.photoName || `Foto_Unit_${r.noPo || 'Sewa'}.jpg`, label: `Foto Kendaraan / Unit — ${r.unit}` }
+      };
+      const item = map[kind];
+      if (item) openAttachmentViewerModal(item.label, item.url, item.name);
+    }
+
+    function previewPengajuanAttachment(recId) {
+      const r = pengajuanSewaRecords.find(x => x.id === recId);
+      if (!r) return;
+      openAttachmentViewerModal(`PDF Kontrak Sewa — ${r.noKontrak || r.noLambung}`, r.kontrakPdf, r.kontrakName || `Kontrak_${r.noKontrak || 'Sewa'}.pdf`);
+    }
+
+    function previewPerubahanAttachment(recId, kind) {
+      const r = perubahanPoRecords.find(x => x.id === recId);
+      if (!r) return;
+      const map = {
+        poLama: { url: r.poLamaPdf, name: r.poLamaName || `PO_Lama_${r.noPoLama}.pdf`, label: `PDF PO Lama — ${r.noPoLama}` },
+        kontrakLama: { url: r.kontrakLamaPdf, name: r.kontrakLamaName || `Kontrak_Lama_${r.noPoLama}.pdf`, label: `PDF Kontrak Lama — ${r.noPoLama}` },
+        poBaru: { url: r.pdfDoc, name: r.pdfDocName || `PO_Baru_${r.noPoBaru}.pdf`, label: `PDF PO Baru / BA — ${r.noPoBaru}` },
+        kontrakBaru: { url: r.kontrakBaruPdf, name: r.kontrakBaruName || `Kontrak_Baru_${r.noPoBaru}.pdf`, label: `PDF Kontrak Baru — ${r.noPoBaru}` }
+      };
+      const item = map[kind];
+      if (item) openAttachmentViewerModal(item.label, item.url, item.name);
+    }
+
     function getDefaultSewa2026Records() {
       return [
         { id: 'LV-01', noPo: 'PO/2026/I/ARC/000008', tanggalPo: '2026-01-08', supplier: 'CV BANGKIT BERJAYA TEKNOLOGI', kategori: 'KENDARAAN OPERASIONAL (LV 4X4)', unit: 'SEWA MOBIL TRITON DOUBLE CABIN BM 8182 QB', masaSewa: '14 Nov 2025 - 15 Des 2025 (1 Bulan)', subtotal: 24500000, ppn: 2695000, pph23: 490000, grandTotal: 26705000, user: 'TEAM PRODUKSI / SITE ARC (PT GEL)', status: 'Aktif' }
@@ -3924,11 +4034,12 @@
           setElText('lvPhotoFileLabel', `✓ ${f.name}`);
           const prev = getEl('lvPhotoPreview');
           if (prev) { prev.src = url; prev.classList.remove('hidden'); }
-        });
+        }, 900, 0.78);
       } else {
         const reader = new FileReader();
         reader.onload = ev => {
           if (kind === 'po') { currentSewaAttachments.poPdf = ev.target.result; currentSewaAttachments.poName = f.name; setElText('lvPoFileLabel', `✓ ${f.name}`); }
+          if (kind === 'kontrak') { currentSewaAttachments.kontrakPdf = ev.target.result; currentSewaAttachments.kontrakName = f.name; setElText('lvKontrakFileLabel', `✓ ${f.name}`); }
           if (kind === 'ba') { currentSewaAttachments.baPdf = ev.target.result; currentSewaAttachments.baName = f.name; setElText('lvBaFileLabel', `✓ ${f.name}`); }
         };
         reader.readAsDataURL(f);
@@ -3939,7 +4050,13 @@
       getEl('sewaLvForm')?.reset();
       setElVal('editingLvId', '');
       setElVal('lvTanggalPo', getTodayIso());
-      currentSewaAttachments = { poPdf: '', poName: '', baPdf: '', baName: '', photo: '', photoName: '' };
+      currentSewaAttachments = { poPdf: '', poName: '', kontrakPdf: '', kontrakName: '', baPdf: '', baName: '', photo: '', photoName: '' };
+      setElText('lvPoFileLabel', 'Belum ada file PDF PO');
+      setElText('lvKontrakFileLabel', 'Belum ada file PDF Kontrak');
+      setElText('lvBaFileLabel', 'Belum ada PDF Berita Acara');
+      setElText('lvPhotoFileLabel', 'Belum ada foto unit');
+      const prev = getEl('lvPhotoPreview');
+      if (prev) { prev.src = ''; prev.classList.add('hidden'); }
     }
 
     function handleSaveSewaLv(e) {
@@ -3964,7 +4081,7 @@
       saveStorage();
       resetSewaLvForm();
       renderSewaLvTable();
-      showToast('Data PO Sewa berhasil disimpan & disinkronkan!', 'success');
+      showToast('Data PO Sewa, Kontrak & Lampiran berhasil disimpan!', 'success');
     }
 
     function loadSampleSewaLv() {
@@ -3987,31 +4104,39 @@
       setElText('lvKpiCount', `${filtered.length} PO`);
       setElText('lvKpiSubtotal', formatRupiah(filtered.reduce((a, r) => a + (Number(r.subtotal) || 0), 0)));
       setElText('lvKpiTotalRate', formatRupiah(filtered.reduce((a, r) => a + (Number(r.grandTotal) || 0), 0)));
-      setElText('lvKpiDocsCount', `${filtered.reduce((a, r) => a + (r.poPdf ? 1 : 0) + (r.baPdf ? 1 : 0) + (r.photo ? 1 : 0), 0)} Lampiran`);
+      setElText('lvKpiDocsCount', `${filtered.reduce((a, r) => a + (r.poPdf ? 1 : 0) + (r.kontrakPdf ? 1 : 0) + (r.baPdf ? 1 : 0) + (r.photo ? 1 : 0), 0)} Lampiran`);
 
-      tbody.innerHTML = filtered.map((r, i) => `
-        <tr class="hover:bg-slate-50">
-          <td class="py-2.5 px-3">${i + 1}</td>
-          <td class="py-2.5 px-3 font-mono font-bold text-blue-900">${escapeHtml(r.noPo)}</td>
-          <td class="py-2.5 px-3">${formatDateShort(r.tanggalPo)}</td>
-          <td class="py-2.5 px-3 font-bold uppercase">${escapeHtml(r.supplier)}</td>
-          <td class="py-2.5 px-3"><b class="uppercase">${escapeHtml(r.unit)}</b><div class="text-[10px] font-bold text-amber-800 uppercase">${escapeHtml(r.kategori || '')}</div></td>
-          <td class="py-2.5 px-3">${escapeHtml(r.masaSewa)}</td>
-          <td class="py-2.5 px-3 text-right">${formatRupiah(r.subtotal)}</td>
-          <td class="py-2.5 px-3 text-right">${formatRupiah(r.ppn)}</td>
-          <td class="py-2.5 px-3 text-right">${formatRupiah(r.pph23)}</td>
-          <td class="py-2.5 px-3 text-right font-black text-emerald-800">${formatRupiah(r.grandTotal)}</td>
-          <td class="py-2.5 px-3 uppercase">${escapeHtml(r.user)}</td>
-          <td class="py-2.5 px-3 text-[10px]">${r.poPdf ? '📄PO ' : ''}${r.baPdf ? '📑BA ' : ''}${r.photo ? '🚙Foto' : ''}</td>
-          <td class="py-2.5 px-3 font-bold">${escapeHtml(r.status || 'Aktif')}</td>
-          <td class="py-2.5 px-3 text-center"><button type="button" onclick="markEntityDeleted('${r.id}');sewaLvRecords=sewaLvRecords.filter(x=>x.id!=='${r.id}');saveStorage();renderSewaLvTable();" class="px-2 py-1 rounded bg-rose-100 text-rose-800 text-[10px] font-bold">Hapus</button></td>
-        </tr>
-      `).join('') || `<tr><td colspan="14" class="py-6 text-center text-slate-400">Belum ada data PO Sewa.</td></tr>`;
+      tbody.innerHTML = filtered.map((r, i) => {
+        const badges = [];
+        if (r.poPdf) badges.push(`<button type="button" onclick="previewSewaLvAttachment('${r.id}','po')" class="px-2 py-1 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-900 border border-rose-300 text-[10px] font-extrabold cursor-pointer">📄 PO</button>`);
+        if (r.kontrakPdf) badges.push(`<button type="button" onclick="previewSewaLvAttachment('${r.id}','kontrak')" class="px-2 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300 text-[10px] font-extrabold cursor-pointer">📜 Kontrak</button>`);
+        if (r.baPdf) badges.push(`<button type="button" onclick="previewSewaLvAttachment('${r.id}','ba')" class="px-2 py-1 rounded-lg bg-indigo-100 hover:bg-indigo-200 text-indigo-900 border border-indigo-300 text-[10px] font-extrabold cursor-pointer">📑 BA</button>`);
+        if (r.photo) badges.push(`<button type="button" onclick="previewSewaLvAttachment('${r.id}','photo')" class="px-2 py-1 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-300 text-[10px] font-extrabold cursor-pointer">🚙 Foto</button>`);
+
+        return `
+          <tr class="hover:bg-slate-50">
+            <td class="py-2.5 px-3">${i + 1}</td>
+            <td class="py-2.5 px-3 font-mono font-bold text-blue-900">${escapeHtml(r.noPo)}</td>
+            <td class="py-2.5 px-3">${formatDateShort(r.tanggalPo)}</td>
+            <td class="py-2.5 px-3 font-bold uppercase">${escapeHtml(r.supplier)}</td>
+            <td class="py-2.5 px-3"><b class="uppercase">${escapeHtml(r.unit)}</b><div class="text-[10px] font-bold text-amber-800 uppercase">${escapeHtml(r.kategori || '')}</div></td>
+            <td class="py-2.5 px-3">${escapeHtml(r.masaSewa)}</td>
+            <td class="py-2.5 px-3 text-right">${formatRupiah(r.subtotal)}</td>
+            <td class="py-2.5 px-3 text-right">${formatRupiah(r.ppn)}</td>
+            <td class="py-2.5 px-3 text-right">${formatRupiah(r.pph23)}</td>
+            <td class="py-2.5 px-3 text-right font-black text-emerald-800">${formatRupiah(r.grandTotal)}</td>
+            <td class="py-2.5 px-3 uppercase">${escapeHtml(r.user)}</td>
+            <td class="py-2.5 px-3"><div class="flex flex-wrap items-center gap-1">${badges.length ? badges.join('') : '<span class="text-slate-400 text-[10px]">-</span>'}</div></td>
+            <td class="py-2.5 px-3 font-bold">${escapeHtml(r.status || 'Aktif')}</td>
+            <td class="py-2.5 px-3 text-center"><button type="button" onclick="markEntityDeleted('${r.id}');sewaLvRecords=sewaLvRecords.filter(x=>x.id!=='${r.id}');saveStorage();renderSewaLvTable();" class="px-2 py-1 rounded bg-rose-100 text-rose-800 text-[10px] font-bold">Hapus</button></td>
+          </tr>
+        `;
+      }).join('') || `<tr><td colspan="14" class="py-6 text-center text-slate-400">Belum ada data PO Sewa.</td></tr>`;
     }
 
     function exportSewaLvExcel() {
       if (typeof XLSX === 'undefined') return;
-      const ws = XLSX.utils.json_to_sheet(sewaLvRecords);
+      const ws = XLSX.utils.json_to_sheet(sewaLvRecords.map(({ poPdf, kontrakPdf, baPdf, photo, ...rest }) => rest));
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'PO_SEWA_JALAN');
       XLSX.writeFile(wb, `Monitoring_PO_Sewa_GEL_${getTodayIso()}.xlsx`);
@@ -4051,6 +4176,7 @@
         alasan: getElVal('psAlasan', '').trim(),
         keterangan: getElVal('psKeterangan', '').trim(),
         kontrakPdf: currentPengajuanKontrakPdf.dataUrl,
+        kontrakName: currentPengajuanKontrakPdf.fileName,
         _updatedAt: Date.now()
       });
       saveStorage();
@@ -4095,14 +4221,19 @@
           <td class="border border-slate-300 py-2 px-2.5 font-bold">${escapeHtml(r.statusKontrak)}</td>
           <td class="border border-slate-300 py-2 px-3">${escapeHtml(r.alasan)}</td>
           <td class="border border-slate-300 py-2 px-3">${escapeHtml(r.keterangan)}</td>
-          <td class="border border-slate-300 py-2 px-2.5 text-center"><button type="button" onclick="markEntityDeleted('${r.id}');pengajuanSewaRecords=pengajuanSewaRecords.filter(x=>x.id!=='${r.id}');saveStorage();renderPengajuanSewaTable();" class="px-2 py-0.5 rounded bg-rose-100 text-rose-800 text-[10px] font-bold">Hapus</button></td>
+          <td class="border border-slate-300 py-2 px-2.5 text-center">
+            <div class="flex items-center justify-center gap-1">
+              ${r.kontrakPdf ? `<button type="button" onclick="previewPengajuanAttachment('${r.id}')" class="px-2 py-0.5 rounded bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300 text-[10px] font-extrabold">📜 Kontrak</button>` : ''}
+              <button type="button" onclick="markEntityDeleted('${r.id}');pengajuanSewaRecords=pengajuanSewaRecords.filter(x=>x.id!=='${r.id}');saveStorage();renderPengajuanSewaTable();" class="px-2 py-0.5 rounded bg-rose-100 text-rose-800 text-[10px] font-bold">Hapus</button>
+            </div>
+          </td>
         </tr>
       `).join('') || `<tr><td colspan="16" class="py-6 text-center text-slate-400">Belum ada pengajuan sewa kendaraan / bangunan.</td></tr>`;
     }
 
     function exportPengajuanSewaExcel() {
       if (typeof XLSX === 'undefined') return;
-      const ws = XLSX.utils.json_to_sheet(pengajuanSewaRecords);
+      const ws = XLSX.utils.json_to_sheet(pengajuanSewaRecords.map(({ kontrakPdf, ...rest }) => rest));
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'PENGAJUAN_SEWA');
       XLSX.writeFile(wb, `Pengajuan_Sewa_GEL_${getTodayIso()}.xlsx`);
@@ -4115,41 +4246,125 @@
       setElVal('gpUnitLama', po.unit);
       setElVal('gpVendorLama', po.supplier);
       setElVal('gpNominalLama', po.grandTotal);
+      if (po.poPdf) {
+        currentPerubahanPoPdf.poLamaPdf = po.poPdf;
+        currentPerubahanPoPdf.poLamaName = po.poName || `PO_Lama_${po.noPo}.pdf`;
+        setElText('gpPoLamaPdfLabel', `✓ Otomatis dari PO Aktif`);
+      }
+      if (po.kontrakPdf) {
+        currentPerubahanPoPdf.kontrakLamaPdf = po.kontrakPdf;
+        currentPerubahanPoPdf.kontrakLamaName = po.kontrakName || `Kontrak_Lama_${po.noPo}.pdf`;
+        setElText('gpKontrakLamaPdfLabel', `✓ Otomatis dari PO Aktif`);
+      }
+    }
+
+    function handlePerubahanPoMultiSelect(kind, files) {
+      if (!files || !files.length) return;
+      const f = files[0];
+      const r = new FileReader();
+      r.onload = ev => {
+        if (kind === 'poLama') {
+          currentPerubahanPoPdf.poLamaPdf = ev.target.result;
+          currentPerubahanPoPdf.poLamaName = f.name;
+          setElText('gpPoLamaPdfLabel', `✓ ${f.name}`);
+        } else if (kind === 'kontrakLama') {
+          currentPerubahanPoPdf.kontrakLamaPdf = ev.target.result;
+          currentPerubahanPoPdf.kontrakLamaName = f.name;
+          setElText('gpKontrakLamaPdfLabel', `✓ ${f.name}`);
+        } else if (kind === 'poBaru') {
+          currentPerubahanPoPdf.dataUrl = ev.target.result;
+          currentPerubahanPoPdf.fileName = f.name;
+          setElText('gpPdfDocLabel', `✓ ${f.name}`);
+        } else if (kind === 'kontrakBaru') {
+          currentPerubahanPoPdf.kontrakBaruPdf = ev.target.result;
+          currentPerubahanPoPdf.kontrakBaruName = f.name;
+          setElText('gpKontrakBaruPdfLabel', `✓ ${f.name}`);
+        }
+      };
+      r.readAsDataURL(f);
     }
 
     function handlePerubahanPoPdfSelect(files) {
-      if (!files || !files.length) return;
-      const r = new FileReader();
-      r.onload = ev => {
-        currentPerubahanPoPdf = { dataUrl: ev.target.result, fileName: files[0].name };
-        setElText('gpPdfDocLabel', `✓ ${files[0].name}`);
-      };
-      r.readAsDataURL(files[0]);
+      handlePerubahanPoMultiSelect('poBaru', files);
     }
 
     function handleSavePerubahanPo(e) {
       e.preventDefault();
+      const noPoLama = getElVal('gpNoPoLama', '').trim().toUpperCase();
+      const noPoBaru = getElVal('gpNoPoBaru', '').trim().toUpperCase();
+      const unitBaru = getElVal('gpUnitBaru', '').trim().toUpperCase();
+      const vendorBaru = getElVal('gpVendorBaru', '').trim().toUpperCase();
+      const tglEfektif = getElVal('gpTanggalEfektif', getTodayIso());
+      const masaSewaBaru = getElVal('gpMasaSewaBaru', '').trim();
+      const nominalBaru = Number(getElVal('gpNominalBaru', 0)) || 0;
+      const userSite = getElVal('gpUserSite', '').trim().toUpperCase();
+
       perubahanPoRecords.unshift({
         id: 'GP-' + Date.now(),
         pt: getElVal('gpEntitasPt', 'ARC'),
-        noPoLama: getElVal('gpNoPoLama', '').trim().toUpperCase(),
+        noPoLama,
         unitLama: getElVal('gpUnitLama', '').trim().toUpperCase(),
         vendorLama: getElVal('gpVendorLama', '').trim().toUpperCase(),
         nominalLama: Number(getElVal('gpNominalLama', 0)) || 0,
-        noPoBaru: getElVal('gpNoPoBaru', '').trim().toUpperCase(),
-        unitBaru: getElVal('gpUnitBaru', '').trim().toUpperCase(),
-        vendorBaru: getElVal('gpVendorBaru', '').trim().toUpperCase(),
-        tanggalEfektif: getElVal('gpTanggalEfektif', getTodayIso()),
-        masaSewaBaru: getElVal('gpMasaSewaBaru', '').trim(),
-        nominalBaru: Number(getElVal('gpNominalBaru', 0)) || 0,
-        userSite: getElVal('gpUserSite', '').trim().toUpperCase(),
+        noPoBaru,
+        unitBaru,
+        vendorBaru,
+        tanggalEfektif: tglEfektif,
+        masaSewaBaru,
+        nominalBaru,
+        userSite,
         alasan: getElVal('gpAlasan', '').trim(),
+        poLamaPdf: currentPerubahanPoPdf.poLamaPdf,
+        poLamaName: currentPerubahanPoPdf.poLamaName,
+        kontrakLamaPdf: currentPerubahanPoPdf.kontrakLamaPdf,
+        kontrakLamaName: currentPerubahanPoPdf.kontrakLamaName,
         pdfDoc: currentPerubahanPoPdf.dataUrl,
+        pdfDocName: currentPerubahanPoPdf.fileName,
+        kontrakBaruPdf: currentPerubahanPoPdf.kontrakBaruPdf,
+        kontrakBaruName: currentPerubahanPoPdf.kontrakBaruName,
         _updatedAt: Date.now()
       });
+
+      if (getEl('gpAutoSyncPoList')?.checked) {
+        sewaLvRecords.forEach(po => {
+          if (String(po.noPo || '').toUpperCase() === noPoLama) {
+            po.status = 'Diganti PO Baru';
+            po._updatedAt = Date.now();
+          }
+        });
+        sewaLvRecords.unshift({
+          id: 'LV-REP-' + Date.now(),
+          noPo: noPoBaru,
+          tanggalPo: tglEfektif,
+          supplier: vendorBaru,
+          kategori: 'KENDARAAN OPERASIONAL (LV 4X4)',
+          unit: unitBaru,
+          masaSewa: masaSewaBaru,
+          subtotal: nominalBaru,
+          ppn: 0,
+          pph23: 0,
+          grandTotal: nominalBaru,
+          user: userSite,
+          status: 'Aktif',
+          poPdf: currentPerubahanPoPdf.dataUrl,
+          poName: currentPerubahanPoPdf.fileName,
+          kontrakPdf: currentPerubahanPoPdf.kontrakBaruPdf,
+          kontrakName: currentPerubahanPoPdf.kontrakBaruName,
+          _updatedAt: Date.now()
+        });
+        renderSewaLvTable();
+      }
+
+      currentPerubahanPoPdf = { poLamaPdf: '', poLamaName: '', kontrakLamaPdf: '', kontrakLamaName: '', dataUrl: '', fileName: '', kontrakBaruPdf: '', kontrakBaruName: '' };
+      setElText('gpPoLamaPdfLabel', 'Belum diunggah');
+      setElText('gpKontrakLamaPdfLabel', 'Belum diunggah');
+      setElText('gpPdfDocLabel', 'Belum diunggah');
+      setElText('gpKontrakBaruPdfLabel', 'Belum diunggah');
+      getEl('perubahanPoForm')?.reset();
+
       saveStorage();
       renderPerubahanPoTable();
-      showToast('Perubahan / Ganti PO berhasil disimpan & disinkronkan!', 'success');
+      showToast('Perubahan / Ganti PO beserta lampiran PO & Kontrak Lama/Baru tersimpan!', 'success');
     }
 
     function loadSamplePerubahanPo() {
@@ -4170,25 +4385,39 @@
       setElText('gpKpiCount', `${perubahanPoRecords.length} Pergantian`);
       setElText('gpKpiOldTotal', formatRupiah(perubahanPoRecords.reduce((a, r) => a + (Number(r.nominalLama) || 0), 0)));
       setElText('gpKpiNewTotal', formatRupiah(perubahanPoRecords.reduce((a, r) => a + (Number(r.nominalBaru) || 0), 0)));
-      setElText('gpKpiDocsCount', `${perubahanPoRecords.filter(r => r.pdfDoc).length} Dokumen`);
+      const totalDocs = perubahanPoRecords.reduce((a, r) => a + (r.poLamaPdf ? 1 : 0) + (r.kontrakLamaPdf ? 1 : 0) + (r.pdfDoc ? 1 : 0) + (r.kontrakBaruPdf ? 1 : 0), 0);
+      setElText('gpKpiDocsCount', `${totalDocs} Dokumen`);
 
-      tbody.innerHTML = perubahanPoRecords.map((r, i) => `
-        <tr>
-          <td class="py-2.5 px-3">${i + 1}</td>
-          <td class="py-2.5 px-3">${formatDateShort(r.tanggalEfektif)}</td>
-          <td class="py-2.5 px-3 font-bold">${escapeHtml(r.pt)} • ${escapeHtml(r.userSite)}</td>
-          <td class="py-2.5 px-3 text-rose-800 font-mono">${escapeHtml(r.noPoLama)} (${escapeHtml(r.unitLama)})</td>
-          <td class="py-2.5 px-3 text-emerald-800 font-mono font-bold">${escapeHtml(r.noPoBaru)} (${escapeHtml(r.unitBaru)})</td>
-          <td class="py-2.5 px-3 text-right font-bold">${formatRupiah((Number(r.nominalBaru) || 0) - (Number(r.nominalLama) || 0))}</td>
-          <td class="py-2.5 px-3">${escapeHtml(r.alasan)}</td>
-          <td class="py-2.5 px-3 text-center"><button type="button" onclick="markEntityDeleted('${r.id}');perubahanPoRecords=perubahanPoRecords.filter(x=>x.id!=='${r.id}');saveStorage();renderPerubahanPoTable();" class="px-2 py-0.5 rounded bg-rose-100 text-rose-800 text-[10px] font-bold">Hapus</button></td>
-        </tr>
-      `).join('') || `<tr><td colspan="8" class="py-6 text-center text-slate-400">Belum ada riwayat perubahan PO.</td></tr>`;
+      tbody.innerHTML = perubahanPoRecords.map((r, i) => {
+        const docBtns = [];
+        if (r.poLamaPdf) docBtns.push(`<button type="button" onclick="previewPerubahanAttachment('${r.id}','poLama')" class="px-2 py-0.5 rounded bg-rose-100 hover:bg-rose-200 text-rose-900 border border-rose-300 text-[10px] font-extrabold">📄 PO Lama</button>`);
+        if (r.kontrakLamaPdf) docBtns.push(`<button type="button" onclick="previewPerubahanAttachment('${r.id}','kontrakLama')" class="px-2 py-0.5 rounded bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300 text-[10px] font-extrabold">📜 Kontrak Lama</button>`);
+        if (r.pdfDoc) docBtns.push(`<button type="button" onclick="previewPerubahanAttachment('${r.id}','poBaru')" class="px-2 py-0.5 rounded bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-300 text-[10px] font-extrabold">📄 PO Baru/BA</button>`);
+        if (r.kontrakBaruPdf) docBtns.push(`<button type="button" onclick="previewPerubahanAttachment('${r.id}','kontrakBaru')" class="px-2 py-0.5 rounded bg-blue-100 hover:bg-blue-200 text-blue-900 border border-blue-300 text-[10px] font-extrabold">📜 Kontrak Baru</button>`);
+
+        return `
+          <tr>
+            <td class="py-2.5 px-3">${i + 1}</td>
+            <td class="py-2.5 px-3">${formatDateShort(r.tanggalEfektif)}</td>
+            <td class="py-2.5 px-3 font-bold">${escapeHtml(r.pt)} • ${escapeHtml(r.userSite)}</td>
+            <td class="py-2.5 px-3 text-rose-800 font-mono">${escapeHtml(r.noPoLama)} (${escapeHtml(r.unitLama)})</td>
+            <td class="py-2.5 px-3 text-emerald-800 font-mono font-bold">${escapeHtml(r.noPoBaru)} (${escapeHtml(r.unitBaru)})</td>
+            <td class="py-2.5 px-3 text-right font-bold">${formatRupiah((Number(r.nominalBaru) || 0) - (Number(r.nominalLama) || 0))}</td>
+            <td class="py-2.5 px-3">${escapeHtml(r.alasan)}</td>
+            <td class="py-2.5 px-3 text-center">
+              <div class="flex flex-wrap items-center justify-center gap-1">
+                ${docBtns.join('')}
+                <button type="button" onclick="markEntityDeleted('${r.id}');perubahanPoRecords=perubahanPoRecords.filter(x=>x.id!=='${r.id}');saveStorage();renderPerubahanPoTable();" class="px-2 py-0.5 rounded bg-rose-100 text-rose-800 text-[10px] font-bold">Hapus</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('') || `<tr><td colspan="8" class="py-6 text-center text-slate-400">Belum ada riwayat perubahan PO.</td></tr>`;
     }
 
     function exportPerubahanPoExcel() {
       if (typeof XLSX === 'undefined') return;
-      const ws = XLSX.utils.json_to_sheet(perubahanPoRecords);
+      const ws = XLSX.utils.json_to_sheet(perubahanPoRecords.map(({ poLamaPdf, kontrakLamaPdf, pdfDoc, kontrakBaruPdf, ...rest }) => rest));
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'GANTI_PO');
       XLSX.writeFile(wb, `Perubahan_Ganti_PO_GEL_${getTodayIso()}.xlsx`);
