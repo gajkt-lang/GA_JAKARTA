@@ -3344,24 +3344,40 @@
     }
 
     function buildCompactCloudPayload() {
-      const stripOversizedPdf = (arr, field) => arr.map(item => {
-        const val = item?.[field];
-        if (typeof val === 'string' && val.length > 350000) {
-          return { ...item, [field]: '', pdfOversizedLocalOnly: true };
-        }
-        return item;
+      const stripHeavyAttachments = (arr, fields) => (Array.isArray(arr) ? arr : []).map(item => {
+        const clone = { ...item };
+        fields.forEach(f => {
+          if (typeof clone[f] === 'string' && clone[f].length > 150000) {
+            clone[f] = '';
+            clone.pdfOversizedLocalOnly = true;
+          }
+        });
+        return clone;
       });
+      const compactCatering = {
+        ...cateringTowerState,
+        reports: (Array.isArray(cateringTowerState.reports) ? cateringTowerState.reports : []).map(rep => {
+          if (!rep || !rep.mealPhotos) return rep;
+          const slimPhotos = {};
+          Object.keys(rep.mealPhotos).forEach(shift => {
+            const arr = Array.isArray(rep.mealPhotos[shift]) ? rep.mealPhotos[shift] : [];
+            slimPhotos[shift] = arr.filter(p => typeof p === 'string' && p.length <= 120000);
+          });
+          return { ...rep, mealPhotos: slimPhotos };
+        })
+      };
       return {
         records,
         ptCustomLogos,
         opsGelRecords,
-        stnkRecords,
-        sewaLvRecords: stripOversizedPdf(sewaLvRecords, 'poPdf'),
-        pengajuanSewaRecords: stripOversizedPdf(pengajuanSewaRecords, 'kontrakPdf'),
-        perubahanPoRecords: stripOversizedPdf(perubahanPoRecords, 'pdfDoc'),
-        ktpRecords,
+        stnkRecords: stripHeavyAttachments(stnkRecords, ['photo']),
+        sewaLvRecords: stripHeavyAttachments(sewaLvRecords, ['poPdf', 'baPdf', 'photo']),
+        pengajuanSewaRecords: stripHeavyAttachments(pengajuanSewaRecords, ['kontrakPdf']),
+        perubahanPoRecords: stripHeavyAttachments(perubahanPoRecords, ['pdfDoc']),
+        ktpRecords: stripHeavyAttachments(ktpRecords, ['photo']),
+        siteAccessDirectory,
         pvrStateByPt,
-        cateringTowerState,
+        cateringTowerState: compactCatering,
         deletedEntityIds
       };
     }
@@ -3375,14 +3391,8 @@
           mergeWorkspaceStates(data.payload);
           isApplyingRemoteSync = false;
         }
-        const fullPayload = {
-          records, ptCustomLogos, opsGelRecords, stnkRecords, sewaLvRecords, pengajuanSewaRecords, perubahanPoRecords, ktpRecords, pvrStateByPt, cateringTowerState, deletedEntityIds
-        };
+        const fullPayload = buildCompactCloudPayload();
         let { error } = await supabaseClient.from(SUPABASE_TABLE_NAME).upsert({ id: SUPABASE_ROW_ID, payload: fullPayload, updated_at: new Date().toISOString() });
-        if (error) {
-          const retry = await supabaseClient.from(SUPABASE_TABLE_NAME).upsert({ id: SUPABASE_ROW_ID, payload: buildCompactCloudPayload(), updated_at: new Date().toISOString() });
-          error = retry.error;
-        }
         setElText('cloudSyncBadge', error ? '☁️ Sync Error' : '☁️ Online Sync');
         if (!error) renderAllWorkspaceViews();
       } catch (err) {
