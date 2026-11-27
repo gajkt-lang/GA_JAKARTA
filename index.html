@@ -447,26 +447,64 @@
     </div>
   </div>
 
-  <!-- Modal Pengaturan Kode Akses Departemen GA -->
+  <!-- Modal Pengaturan Kode Akses Departemen GA & Multi-Site (17 Site) -->
   <div id="gaSecurityModal" class="fixed inset-0 z-50 bg-slate-950/75 hidden items-center justify-center p-4 no-print" onclick="closeGaSecurityModal()">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4" onclick="event.stopPropagation()">
+    <div class="bg-white rounded-3xl max-w-3xl w-full p-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto space-y-5" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <div>
-          <h3 class="text-base font-black text-slate-900">🔐 Pengaturan Keamanan Departemen GA</h3>
-          <p class="text-[11px] text-slate-500">Ubah kode akses agar hanya tim GA yang dapat membuka portal online.</p>
+          <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-950 text-[10px] font-black uppercase">MULTI-SITE ACCESS CONTROL • GA HO JAKARTA</span>
+          <h3 class="text-base font-black text-slate-900 mt-0.5">🔐 Manajemen Kode Akses GA HO &amp; 17+ Site Operasional</h3>
+          <p class="text-[11px] text-slate-500">Setiap site memiliki kode unik masing-masing (PIC Site otomatis terkunci hanya pada site-nya). Perubahan langsung aktif di server Supabase.</p>
         </div>
         <button type="button" onclick="closeGaSecurityModal()" class="text-slate-400 hover:text-slate-700 font-bold">✕</button>
       </div>
-      <form onsubmit="saveNewGaPasscode(event)" class="space-y-3">
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Kode Akses Baru Departemen GA *</label>
-          <input type="text" id="newGaPasscodeInput" required minlength="4" placeholder="Contoh: GAJKT2026!" class="w-full h-10 px-3 text-xs border border-slate-300 rounded-xl font-mono font-extrabold" />
+
+      <!-- Bagian A: Ganti Kode Utama Dept. GA HO -->
+      <form onsubmit="saveNewGaPasscode(event)" class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 flex flex-wrap items-end justify-between gap-3">
+        <div class="flex-1 min-w-[220px]">
+          <label class="block text-xs font-black text-amber-950 mb-1">🛡️ Kode Akses Utama Dept. GA HO Jakarta (Kontrol Penuh 5 Modul)</label>
+          <input type="text" id="newGaPasscodeInput" required minlength="6" placeholder="Ketik kode baru Dept. GA (min. 6 karakter)..." class="w-full h-9 px-3 text-xs border border-amber-300 rounded-xl bg-white font-mono font-extrabold" />
         </div>
-        <div class="flex justify-end gap-2 pt-2">
-          <button type="button" onclick="closeGaSecurityModal()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold">Batal</button>
-          <button type="submit" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-extrabold">Simpan Kode Baru</button>
+        <button type="submit" class="h-9 px-4 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-extrabold shadow-xs">Simpan Kode GA HO</button>
+      </form>
+
+      <!-- Bagian B: Tambah / Update Kode Akses Site Baru -->
+      <form onsubmit="saveSiteAccessCodeForm(event)" class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+        <div class="text-xs font-black text-slate-800">👷 Tambah / Perbarui Kode Akses Site (Server-Side SHA-256)</div>
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+          <div class="sm:col-span-3">
+            <input type="text" id="secSiteCodeInput" required placeholder="Kode (cth: SITE-04)" class="w-full h-9 px-2.5 text-xs border border-slate-300 rounded-xl bg-white font-mono font-bold uppercase" />
+          </div>
+          <div class="sm:col-span-5">
+            <input type="text" id="secSiteNameInput" required placeholder="Nama Site (cth: Site 04 — PT GEL EPM)" class="w-full h-9 px-2.5 text-xs border border-slate-300 rounded-xl bg-white font-bold" />
+          </div>
+          <div class="sm:col-span-4 flex gap-1.5">
+            <input type="text" id="secSitePassInput" required minlength="5" placeholder="Kode Login Site" class="w-full h-9 px-2.5 text-xs border border-blue-300 rounded-xl bg-white font-mono font-extrabold text-blue-900" />
+            <button type="submit" class="h-9 px-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold shrink-0">Simpan</button>
+          </div>
         </div>
       </form>
+
+      <!-- Bagian C: Daftar 17+ Site & Kode Default / Aktif -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-black text-slate-800">Daftar Site &amp; Panduan Kode Login Masing-Masing Site</span>
+          <span class="text-[10.5px] font-bold text-emerald-700">✓ Otomatis Terenkripsi SHA-256 di Supabase</span>
+        </div>
+        <div class="overflow-x-auto rounded-2xl border border-slate-200 max-h-64 overflow-y-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead class="bg-slate-800 text-white text-[10.5px] font-extrabold uppercase sticky top-0">
+              <tr>
+                <th class="py-2 px-3">Kode</th>
+                <th class="py-2 px-3">Nama Site Operasional</th>
+                <th class="py-2 px-3">Kode Login Site</th>
+                <th class="py-2 px-3 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="siteAccessCodesTableBody" class="divide-y divide-slate-200 bg-white"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -2394,7 +2432,28 @@
     // Server-verified corporate passcodes (Supabase RPC / RLS)
 
     let currentAccessRole = 'SITE_USER';
+    let currentSiteScope = 'ALL';
     let loginGateMode = 'SITE';
+    const DEFAULT_17_SITE_KEYS = [
+      { code: 'SITE-01', name: 'Site 01 — PT GEL (ARC)', hintPass: 'SITE01ARC' },
+      { code: 'SITE-02', name: 'Site 02 — PT GEL (MI)', hintPass: 'SITE02MI' },
+      { code: 'SITE-03', name: 'Site 03 — PT GEL (BSPC)', hintPass: 'SITE03BSPC' },
+      { code: 'SITE-04', name: 'Site 04 — PT GEL (EPM)', hintPass: 'SITE04EPM' },
+      { code: 'SITE-05', name: 'Site 05 — PT GEL (GSM)', hintPass: 'SITE05GSM' },
+      { code: 'SITE-06', name: 'Site 06 — PT GEL (GSJ)', hintPass: 'SITE06GSJ' },
+      { code: 'SITE-07', name: 'Site 07 — PT GEL (KMC)', hintPass: 'SITE07KMC' },
+      { code: 'SITE-08', name: 'Site 08 — PT GEL (QIN)', hintPass: 'SITE08QIN' },
+      { code: 'SITE-09', name: 'Site 09 — PT GEL (BSPC-PORT)', hintPass: 'SITE09PORT' },
+      { code: 'SITE-10', name: 'Site 10 — PT GEL (SIP)', hintPass: 'SITE10SIP' },
+      { code: 'SITE-11', name: 'Site 11 — PT GEL (SIP-PORT)', hintPass: 'SITE11PORT' },
+      { code: 'SITE-12', name: 'Site 12 — PT GEL (TER)', hintPass: 'SITE12TER' },
+      { code: 'SITE-13', name: 'Site 13 — PT GEL (MDF)', hintPass: 'SITE13MDF' },
+      { code: 'SITE-14', name: 'Site 14 — PT GEL (KKS)', hintPass: 'SITE14KKS' },
+      { code: 'SITE-15', name: 'Site 15 — PT GEL (GK)', hintPass: 'SITE15GK' },
+      { code: 'SITE-16', name: 'Site 16 — PT GEL (PKU)', hintPass: 'SITE16PKU' },
+      { code: 'SITE-17', name: 'Site 17 — PT GEL (HO-OPS)', hintPass: 'SITE17HO' }
+    ];
+    let siteAccessDirectory = JSON.parse(JSON.stringify(DEFAULT_17_SITE_KEYS));
     let records = [];
     let ptCustomLogos = {};
     let opsGelRecords = [];
@@ -2570,51 +2629,23 @@
       role: 'supervisor',
       currentPage: 'dashboard',
       sites: [
-        {
-          id: 'SITE-01',
-          name: 'Site 01 — PT GEL (ARC)',
-          kitchenMode: 'MULTI_VENDOR',
-          vendor: 'CV Mitra Boga Nusantara (Pagi-Siang) / Warung Mandiri (Malam-Supper)',
-          contactPerson: 'Ibu Sari (0812-7788-9901)',
-          vendorPagi: 'CV Mitra Boga Nusantara',
-          vendorSiang: 'CV Mitra Boga Nusantara',
-          vendorMalam: 'Warung Mandiri Site',
-          vendorSupper: 'Warung Mandiri Site',
-          pic: 'PIC Site 01',
-          baseSiteCount: 200,
-          baseLokalCount: 0,
-          rate: 38000
-        },
-        {
-          id: 'SITE-02',
-          name: 'Site 02 — PT GEL (MI)',
-          kitchenMode: 'SELF_COOK',
-          vendor: 'Kantin Internal / Masak Sendiri Site',
-          contactPerson: 'Pak Hendro - Kepala Dapur (0813-6655-4433)',
-          vendorPagi: 'Kantin Internal Site',
-          vendorSiang: 'Kantin Internal Site',
-          vendorMalam: 'Kantin Internal Site',
-          vendorSupper: 'Kantin Internal Site',
-          pic: 'PIC Site 02',
-          baseSiteCount: 150,
-          baseLokalCount: 0,
-          rate: 32000
-        },
-        {
-          id: 'SITE-03',
-          name: 'Site 03 — PT GEL (BSPC)',
-          kitchenMode: 'SINGLE_VENDOR',
-          vendor: 'PT Prima Rasa Catering',
-          contactPerson: 'Bpk. Darmawan (0811-2233-4455)',
-          vendorPagi: 'PT Prima Rasa Catering',
-          vendorSiang: 'PT Prima Rasa Catering',
-          vendorMalam: 'PT Prima Rasa Catering',
-          vendorSupper: 'PT Prima Rasa Catering',
-          pic: 'PIC Site 03',
-          baseSiteCount: 120,
-          baseLokalCount: 0,
-          rate: 38000
-        }
+        { id: 'SITE-01', name: 'Site 01 — PT GEL (ARC)', kitchenMode: 'MULTI_VENDOR', vendor: 'CV Mitra Boga Nusantara (Pagi-Siang) / Warung Mandiri (Malam-Supper)', contactPerson: 'Ibu Sari (0812-7788-9901)', vendorPagi: 'CV Mitra Boga Nusantara', vendorSiang: 'CV Mitra Boga Nusantara', vendorMalam: 'Warung Mandiri Site', vendorSupper: 'Warung Mandiri Site', pic: 'PIC Site 01', baseSiteCount: 200, baseLokalCount: 0, rate: 38000 },
+        { id: 'SITE-02', name: 'Site 02 — PT GEL (MI)', kitchenMode: 'SELF_COOK', vendor: 'Kantin Internal / Masak Sendiri Site', contactPerson: 'Pak Hendro - Kepala Dapur (0813-6655-4433)', vendorPagi: 'Kantin Internal Site', vendorSiang: 'Kantin Internal Site', vendorMalam: 'Kantin Internal Site', vendorSupper: 'Kantin Internal Site', pic: 'PIC Site 02', baseSiteCount: 150, baseLokalCount: 0, rate: 32000 },
+        { id: 'SITE-03', name: 'Site 03 — PT GEL (BSPC)', kitchenMode: 'SINGLE_VENDOR', vendor: 'PT Prima Rasa Catering', contactPerson: 'Bpk. Darmawan (0811-2233-4455)', vendorPagi: 'PT Prima Rasa Catering', vendorSiang: 'PT Prima Rasa Catering', vendorMalam: 'PT Prima Rasa Catering', vendorSupper: 'PT Prima Rasa Catering', pic: 'PIC Site 03', baseSiteCount: 120, baseLokalCount: 0, rate: 38000 },
+        { id: 'SITE-04', name: 'Site 04 — PT GEL (EPM)', kitchenMode: 'SINGLE_VENDOR', vendor: 'Vendor Catering Site 04', contactPerson: 'PIC Vendor Site 04', vendorPagi: 'Vendor Catering Site 04', vendorSiang: 'Vendor Catering Site 04', vendorMalam: 'Vendor Catering Site 04', vendorSupper: 'Vendor Catering Site 04', pic: 'PIC Site 04', baseSiteCount: 100, baseLokalCount: 0, rate: 35000 },
+        { id: 'SITE-05', name: 'Site 05 — PT GEL (GSM)', kitchenMode: 'SINGLE_VENDOR', vendor: 'Vendor Catering Site 05', contactPerson: 'PIC Vendor Site 05', vendorPagi: 'Vendor Catering Site 05', vendorSiang: 'Vendor Catering Site 05', vendorMalam: 'Vendor Catering Site 05', vendorSupper: 'Vendor Catering Site 05', pic: 'PIC Site 05', baseSiteCount: 80, baseLokalCount: 0, rate: 35000 },
+        { id: 'SITE-06', name: 'Site 06 — PT GEL (GSJ)', kitchenMode: 'SINGLE_VENDOR', vendor: 'Vendor Catering Site 06', contactPerson: 'PIC Vendor Site 06', vendorPagi: 'Vendor Catering Site 06', vendorSiang: 'Vendor Catering Site 06', vendorMalam: 'Vendor Catering Site 06', vendorSupper: 'Vendor Catering Site 06', pic: 'PIC Site 06', baseSiteCount: 80, baseLokalCount: 0, rate: 35000 },
+        { id: 'SITE-07', name: 'Site 07 — PT GEL (KMC)', kitchenMode: 'SINGLE_VENDOR', vendor: 'Vendor Catering Site 07', contactPerson: 'PIC Vendor Site 07', vendorPagi: 'Vendor Catering Site 07', vendorSiang: 'Vendor Catering Site 07', vendorMalam: 'Vendor Catering Site 07', vendorSupper: 'Vendor Catering Site 07', pic: 'PIC Site 07', baseSiteCount: 120, baseLokalCount: 0, rate: 35000 },
+        { id: 'SITE-08', name: 'Site 08 — PT GEL (QIN)', kitchenMode: 'SINGLE_VENDOR', vendor: 'Vendor Catering Site 08', contactPerson: 'PIC Vendor Site 08', vendorPagi: 'Vendor Catering Site 08', vendorSiang: 'Vendor Catering Site 08', vendorMalam: 'Vendor Catering Site 08', vendorSupper: 'Vendor Catering Site 08', pic: 'PIC Site 08', baseSiteCount: 110, baseLokalCount: 0, rate: 35000 },
+        { id: 'SITE-09', name: 'Site 09 — PT GEL (BSPC-PORT)', kitchenMode: 'SINGLE_VENDOR', vendor: 'Vendor Catering Site 09', contactPerson: 'PIC Vendor Site 09', vendorPagi: 'Vendor Catering Site 09', vendorSiang: 'Vendor Catering Site 09', vendorMalam: 'Vendor Catering Site 09', vendorSupper: 'Vendor Catering Site 09', pic: 'PIC Site 09', baseSiteCount: 90, baseLokalCount: 0, rate: 35000 },
+        { id: 'SITE-10', name: 'Site 10 — PT GEL (SIP)', kitchenMode: 'SINGLE_VENDOR', vendor: 'Vendor Catering Site 10', contactPerson: 'PIC Vendor Site 10', vendorPagi: 'Vendor Catering Site 10', vendorSiang: 'Vendor Catering Site 10', vendorMalam: 'Vendor Catering Site 10', vendorSupper: 'Vendor Catering Site 10', pic: 'PIC Site 10', baseSiteCount: 100, baseLokalCount: 0, rate: 35000 },
+        { id: 'SITE-11', name: 'Site 11 — PT GEL (SIP-PORT)', kitchenMode: 'SINGLE_VENDOR', vendor: 'Vendor Catering Site 11', contactPerson: 'PIC Vendor Site 11', vendorPagi: 'Vendor Catering Site 11', vendorSiang: 'Vendor Catering Site 11', vendorMalam: 'Vendor Catering Site 11', vendorSupper: 'Vendor Catering Site 11', pic: 'PIC Site 11', baseSiteCount: 75, baseLokalCount: 0, rate: 35000 },
+        { id: 'SITE-12', name: 'Site 12 — PT GEL (TER)', kitchenMode: 'SINGLE_VENDOR', vendor: 'Vendor Catering Site 12', contactPerson: 'PIC Vendor Site 12', vendorPagi: 'Vendor Catering Site 12', vendorSiang: 'Vendor Catering Site 12', vendorMalam: 'Vendor Catering Site 12', vendorSupper: 'Vendor Catering Site 12', pic: 'PIC Site 12', baseSiteCount: 95, baseLokalCount: 0, rate: 35000 },
+        { id: 'SITE-13', name: 'Site 13 — PT GEL (MDF)', kitchenMode: 'SINGLE_VENDOR', vendor: 'Vendor Catering Site 13', contactPerson: 'PIC Vendor Site 13', vendorPagi: 'Vendor Catering Site 13', vendorSiang: 'Vendor Catering Site 13', vendorMalam: 'Vendor Catering Site 13', vendorSupper: 'Vendor Catering Site 13', pic: 'PIC Site 13', baseSiteCount: 110, baseLokalCount: 0, rate: 35000 },
+        { id: 'SITE-14', name: 'Site 14 — PT GEL (KKS)', kitchenMode: 'SINGLE_VENDOR', vendor: 'Vendor Catering Site 14', contactPerson: 'PIC Vendor Site 14', vendorPagi: 'Vendor Catering Site 14', vendorSiang: 'Vendor Catering Site 14', vendorMalam: 'Vendor Catering Site 14', vendorSupper: 'Vendor Catering Site 14', pic: 'PIC Site 14', baseSiteCount: 85, baseLokalCount: 0, rate: 35000 },
+        { id: 'SITE-15', name: 'Site 15 — PT GEL (GK)', kitchenMode: 'SINGLE_VENDOR', vendor: 'Vendor Catering Site 15', contactPerson: 'PIC Vendor Site 15', vendorPagi: 'Vendor Catering Site 15', vendorSiang: 'Vendor Catering Site 15', vendorMalam: 'Vendor Catering Site 15', vendorSupper: 'Vendor Catering Site 15', pic: 'PIC Site 15', baseSiteCount: 90, baseLokalCount: 0, rate: 35000 },
+        { id: 'SITE-16', name: 'Site 16 — PT GEL (PKU)', kitchenMode: 'SINGLE_VENDOR', vendor: 'Vendor Catering Site 16', contactPerson: 'PIC Vendor Site 16', vendorPagi: 'Vendor Catering Site 16', vendorSiang: 'Vendor Catering Site 16', vendorMalam: 'Vendor Catering Site 16', vendorSupper: 'Vendor Catering Site 16', pic: 'PIC Site 16', baseSiteCount: 70, baseLokalCount: 0, rate: 35000 },
+        { id: 'SITE-17', name: 'Site 17 — PT GEL (HO-OPS)', kitchenMode: 'SINGLE_VENDOR', vendor: 'Vendor Catering Site 17', contactPerson: 'PIC Vendor Site 17', vendorPagi: 'Vendor Catering Site 17', vendorSiang: 'Vendor Catering Site 17', vendorMalam: 'Vendor Catering Site 17', vendorSupper: 'Vendor Catering Site 17', pic: 'PIC Site 17', baseSiteCount: 60, baseLokalCount: 0, rate: 35000 }
       ],
       reports: [],
       employees: [
@@ -2748,8 +2779,19 @@
       if (inp) inp.type = inp.type === 'password' ? 'text' : 'password';
     }
 
-    function applyRoleVisibility(role, staffName) {
+    function getVisibleSitesForCurrentUser() {
+      const all = cateringTowerState.sites || [];
+      if (currentAccessRole === 'GA_ADMIN' || !currentSiteScope || currentSiteScope === 'ALL') return all;
+      const scoped = all.filter(s =>
+        String(s.id || '').toUpperCase() === String(currentSiteScope).toUpperCase() ||
+        String(s.name || '').toUpperCase().includes(String(currentSiteScope).toUpperCase())
+      );
+      return scoped.length ? scoped : all;
+    }
+
+    function applyRoleVisibility(role, staffName, siteScope = 'ALL') {
       currentAccessRole = role;
+      currentSiteScope = siteScope || 'ALL';
       const isGa = role === 'GA_ADMIN';
       ['ticketing', 'opsga', 'stnk'].forEach(mod => {
         getEl(`navGroup-${mod}`)?.classList.toggle('hidden', !isGa);
@@ -2758,9 +2800,10 @@
       });
       getEl('sidebarChangeCodeBtn')?.classList.toggle('hidden', !isGa);
 
-      setElText('sidebarWorkspaceTitle', isGa ? 'WORKSPACE GA' : 'WORKSPACE SITE');
-      setElText('sidebarSessionRoleBadge', isGa ? '● GA Verified Session' : '● Site Operator Session');
-      setElText('sidebarActiveStaffLabel', staffName || (isGa ? 'Tim General Affair' : 'PIC Site'));
+      const siteLabel = (!isGa && currentSiteScope && currentSiteScope !== 'ALL') ? ` (${currentSiteScope})` : '';
+      setElText('sidebarWorkspaceTitle', isGa ? 'WORKSPACE GA' : `WORKSPACE SITE${siteLabel}`);
+      setElText('sidebarSessionRoleBadge', isGa ? '● GA Verified Session' : `● Site Session${siteLabel}`);
+      setElText('sidebarActiveStaffLabel', staffName || (isGa ? 'Tim General Affair' : `PIC ${currentSiteScope}`));
 
       const ctRole = getEl('ctRoleSwitch');
       if (ctRole) {
@@ -2769,7 +2812,19 @@
         cateringTowerState.role = ctRole.value;
       }
 
+      if (!isGa && currentSiteScope && currentSiteScope !== 'ALL') {
+        ctDashboardSiteFilter = currentSiteScope;
+        const lvUserInp = getEl('lvUser');
+        if (lvUserInp && (!lvUserInp.value || lvUserInp.value.includes('ANUGRAH RIAU COAL'))) {
+          const matchedSite = getVisibleSitesForCurrentUser()[0];
+          if (matchedSite) lvUserInp.value = matchedSite.name.toUpperCase();
+        }
+      } else {
+        ctDashboardSiteFilter = 'ALL';
+      }
+
       switchPrimaryModule(isGa ? 'ticketing' : 'sewalv');
+      renderAllWorkspaceViews();
     }
 
     async function sha256Hex(str) {
@@ -2803,6 +2858,7 @@
         const codeHash = await sha256Hex(rawCode);
         let verifiedRole = null;
         let siteScope = 'ALL';
+        let siteDisplayName = '';
 
         if (supabaseClient) {
           const { data, error } = await supabaseClient.rpc('verify_portal_access_code', {
@@ -2813,6 +2869,7 @@
           if (!error && data && data.allowed) {
             verifiedRole = data.role;
             siteScope = data.site_scope || 'ALL';
+            siteDisplayName = data.site_name || siteScope;
           }
         }
 
@@ -2822,15 +2879,15 @@
           return;
         }
 
-        const sessionObj = { role: verifiedRole, staff, siteScope, codeHash };
+        const sessionObj = { role: verifiedRole, staff, siteScope, siteDisplayName, codeHash };
         sessionStorage.setItem(GA_SESSION_KEY, JSON.stringify(sessionObj));
         getEl('gaAccessGateOverlay')?.classList.add('hidden');
-        applyRoleVisibility(verifiedRole, staff);
+        applyRoleVisibility(verifiedRole, staff, siteScope);
         await pullStateFromSupabase();
         showToast(
           verifiedRole === 'GA_ADMIN'
             ? `Selamat datang ${staff} — Kontrol Penuh Dept. GA HO Jakarta aktif.`
-            : `Selamat datang ${staff} — Akses Tim Site (Sewa & Katering) aktif.`,
+            : `Selamat datang ${staff} — Akses ${siteDisplayName || siteScope} aktif.`,
           'success'
         );
       } catch (err) {
@@ -2845,10 +2902,29 @@
 
     function lockGaPortal() {
       sessionStorage.removeItem(GA_SESSION_KEY);
+      currentSiteScope = 'ALL';
       getEl('gaAccessGateOverlay')?.classList.remove('hidden');
     }
 
+    function renderSiteAccessCodesTable() {
+      const tbody = getEl('siteAccessCodesTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = siteAccessDirectory.map(s => `
+        <tr class="hover:bg-slate-50">
+          <td class="py-2 px-3 font-mono font-black text-slate-900">${escapeHtml(s.code)}</td>
+          <td class="py-2 px-3 font-bold text-slate-800">${escapeHtml(s.name)}</td>
+          <td class="py-2 px-3 font-mono font-extrabold text-blue-800">${escapeHtml(s.hintPass || 'Tersimpan di Server')}</td>
+          <td class="py-2 px-3 text-center">
+            <button type="button" onclick="setElVal('secSiteCodeInput','${escapeHtml(s.code)}');setElVal('secSiteNameInput','${escapeHtml(s.name)}');setElVal('secSitePassInput','${escapeHtml(s.hintPass || '')}');" class="px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-950 text-[10px] font-extrabold">
+              ✎ Ubah Kode
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
     function openGaSecurityModal() {
+      renderSiteAccessCodesTable();
       const m = getEl('gaSecurityModal');
       if (m) { m.classList.remove('hidden'); m.classList.add('flex'); }
     }
@@ -2872,8 +2948,49 @@
           p_new_hash: newHash
         });
       }
-      closeGaSecurityModal();
-      showToast('Kode akses Departemen GA berhasil diperbarui di server.', 'success');
+      setElVal('newGaPasscodeInput', '');
+      showToast('Kode akses Departemen GA HO berhasil diperbarui di server.', 'success');
+    }
+
+    async function saveSiteAccessCodeForm(e) {
+      e.preventDefault();
+      const siteCode = getElVal('secSiteCodeInput', '').trim().toUpperCase();
+      const siteName = getElVal('secSiteNameInput', '').trim();
+      const sitePass = getElVal('secSitePassInput', '').trim();
+      if (!siteCode || !siteName || sitePass.length < 5) {
+        showToast('Lengkapi Kode Site, Nama Site, dan Kode Login minimal 5 karakter.', 'warning');
+        return;
+      }
+      const newHash = await sha256Hex(sitePass);
+      if (supabaseClient) {
+        const { error } = await supabaseClient.rpc('upsert_site_access_code', {
+          p_site_code: siteCode,
+          p_site_name: siteName,
+          p_code_hash: newHash
+        });
+        if (error) {
+          showToast('Pastikan skrip SQL Multi-Site sudah dijalankan di Supabase.', 'error');
+          return;
+        }
+      }
+      const existingIdx = siteAccessDirectory.findIndex(x => x.code === siteCode);
+      if (existingIdx >= 0) {
+        siteAccessDirectory[existingIdx] = { code: siteCode, name: siteName, hintPass: sitePass };
+      } else {
+        siteAccessDirectory.push({ code: siteCode, name: siteName, hintPass: sitePass });
+      }
+      if (!cateringTowerState.sites.some(s => s.id === siteCode)) {
+        cateringTowerState.sites.push({
+          id: siteCode, name: siteName, kitchenMode: 'SINGLE_VENDOR', vendor: 'Vendor Catering Site',
+          contactPerson: '-', vendorPagi: 'Vendor Catering Site', vendorSiang: 'Vendor Catering Site',
+          vendorMalam: 'Vendor Catering Site', vendorSupper: 'Vendor Catering Site', pic: 'PIC ' + siteCode,
+          baseSiteCount: 100, baseLokalCount: 0, rate: 35000, _updatedAt: Date.now()
+        });
+      }
+      saveStorage();
+      renderSiteAccessCodesTable();
+      ctRender();
+      showToast(`Kode akses ${siteName} (${siteCode}) berhasil disimpan & aktif di server!`, 'success');
     }
 
     function initGaAccessGate() {
@@ -2884,7 +3001,7 @@
           const parsed = JSON.parse(saved);
           if (parsed && parsed.role) {
             getEl('gaAccessGateOverlay')?.classList.add('hidden');
-            applyRoleVisibility(parsed.role, parsed.staff);
+            applyRoleVisibility(parsed.role, parsed.staff, parsed.siteScope || 'ALL');
             return;
           }
         }
@@ -3142,6 +3259,7 @@
       pengajuanSewaRecords = mergeByKey(pengajuanSewaRecords, remote.pengajuanSewaRecords, ps => ps?.id);
       perubahanPoRecords = mergeByKey(perubahanPoRecords, remote.perubahanPoRecords, gp => gp?.id);
       ktpRecords = mergeByKey(ktpRecords, remote.ktpRecords, k => k?.nik || k?.id);
+      if (Array.isArray(remote.siteAccessDirectory) && remote.siteAccessDirectory.length) { siteAccessDirectory = remote.siteAccessDirectory; }
       if (remote.ptCustomLogos && typeof remote.ptCustomLogos === 'object') {
         ptCustomLogos = { ...remote.ptCustomLogos, ...ptCustomLogos };
       }
@@ -3186,6 +3304,7 @@
           pengajuanSewaRecords,
           perubahanPoRecords,
           ktpRecords,
+          siteAccessDirectory,
           pvrStateByPt,
           cateringTowerState,
           deletedEntityIds
@@ -3850,7 +3969,7 @@
       const q = getElVal('lvSearchFilter', '').toLowerCase();
       const cat = getElVal('lvCategoryFilter', 'ALL');
       const st = getElVal('lvStatusFilter', 'ALL');
-      const filtered = sewaLvRecords.filter(r =>
+      const filtered = sewaLvRecords.filter(r => (currentAccessRole === 'GA_ADMIN' || currentSiteScope === 'ALL' || String(r.user || '').toUpperCase().includes(String(currentSiteScope).toUpperCase())) &&
         (!q || [r.noPo, r.supplier, r.unit, r.user].some(v => String(v || '').toLowerCase().includes(q))) &&
         (cat === 'ALL' || String(r.kategori || '').toUpperCase() === cat) &&
         (st === 'ALL' || (r.status || 'Aktif') === st)
@@ -4454,7 +4573,7 @@
               <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Site (Berlaku Semua Site) *</label>
                 <select id="ctMaSite" onchange="ctSyncModalFromSiteMaster()" class="w-full h-9 px-3 text-xs border border-slate-300 rounded-xl font-extrabold">
-                  ${cateringTowerState.sites.map(s => `<option value="${escapeHtml(s.name)}" ${preselectedSiteName === s.name ? 'selected' : ''}>${escapeHtml(s.name)}</option>`).join('')}
+                  ${getVisibleSitesForCurrentUser().map(s => `<option value="${escapeHtml(s.name)}" ${preselectedSiteName === s.name ? 'selected' : ''}>${escapeHtml(s.name)}</option>`).join('')}
                 </select>
               </div>
               <div>
@@ -4820,7 +4939,7 @@
           YEARLY: `Tahunan (Tahun ${ctDashboardYear})`
         };
         const mult = multiplierMap[ctDashboardPeriod] || 1;
-        const visibleSites = cateringTowerState.sites.filter(s => ctDashboardSiteFilter === 'ALL' || s.id === ctDashboardSiteFilter);
+        const visibleSites = getVisibleSitesForCurrentUser().filter(s => ctDashboardSiteFilter === 'ALL' || s.id === ctDashboardSiteFilter);
 
         let grandPorsi = 0;
         let grandCost = 0;
@@ -4983,7 +5102,7 @@
         `;
       } else if (page === 'sites') {
         const q = ctVendorSearchQuery.toLowerCase();
-        const filteredSites = cateringTowerState.sites.filter(s =>
+        const filteredSites = getVisibleSitesForCurrentUser().filter(s =>
           !q || [s.id, s.name, s.vendor, s.contactPerson, s.pic].some(v => String(v || '').toLowerCase().includes(q))
         );
         container.innerHTML = `
@@ -5040,7 +5159,7 @@
       } else if (page === 'actual') {
         const list = (cateringTowerState.reports || []).filter(r => r.type === 'Meal Actual');
         const todayStr = getTodayIso();
-        const complianceBadges = (cateringTowerState.sites || []).map(s => {
+        const complianceBadges = getVisibleSitesForCurrentUser().map(s => {
           const doneToday = list.some(r => r.site === s.name && r.date === todayStr);
           return doneToday
             ? `<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-950 border border-emerald-300 text-[11px] font-extrabold">✓ ${escapeHtml(s.name)} (Sudah Lapor Hari Ini)</span>`
@@ -5115,7 +5234,7 @@
           </div>
         `;
       } else if (page === 'employees') {
-        const siteOptions = cateringTowerState.sites.map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('');
+        const siteOptions = getVisibleSitesForCurrentUser().map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('');
         container.innerHTML = `
           <div class="space-y-4">
             <div>
@@ -5190,7 +5309,7 @@
           </div>
         `;
       } else if (page === 'overtime') {
-        const siteOptions = cateringTowerState.sites.map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('');
+        const siteOptions = getVisibleSitesForCurrentUser().map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('');
         container.innerHTML = `
           <div class="space-y-4">
             <div>
@@ -5242,7 +5361,7 @@
           </div>
         `;
       } else if (page === 'guests') {
-        const siteOptions = cateringTowerState.sites.map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('');
+        const siteOptions = getVisibleSitesForCurrentUser().map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('');
         container.innerHTML = `
           <div class="space-y-4">
             <h3 class="text-base font-black text-slate-900">♧ Guest Register (Tamu di Site Otomatis Dapat Makan)</h3>
