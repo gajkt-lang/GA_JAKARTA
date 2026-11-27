@@ -2441,8 +2441,8 @@
       'GSJ': { fullName: 'PT. GLOBAL SAMUDERA JASINDO', sub: 'STEVEDORING & MARINE OPERATIONS' },
       'KMC': { fullName: 'PT. KARINA MINING CONTRACTOR', sub: 'MINING CONTRACTOR & HEAVY EQUIPMENT' },
       'QIN': { fullName: 'PT QUASAR INTI NUSANTARA', sub: 'QIN COAL MINING OPERATIONS' },
-      'BSPC': { fullName: 'PT. BUKIT SUNUR PRIMA COAL', sub: 'COAL MINING OPERATIONS' },
-      'BSPC-PORT': { fullName: 'PT. BUKIT SUNUR PRIMA COAL (PORT)', sub: 'PORT & JETTY OPERATIONS' },
+      'BSPC': { fullName: 'PT. BHUMI SRIWIJAYA PERDANA COAL', sub: 'COAL MINING OPERATIONS' },
+      'BSPC-PORT': { fullName: 'PT. BHUMI SRIWIJAYA PERDANA COAL (PORT)', sub: 'PORT & JETTY OPERATIONS' },
       'SIP': { fullName: 'PT. SUMATERA INTI PERKASA', sub: 'MINING & ENERGY OPERATIONS' },
       'SIP-PORT': { fullName: 'PT. SUMATERA INTI PERKASA (PORT)', sub: 'PORT & BARGE LOADING' },
       'TER': { fullName: 'PT TEMPIRAI ENERGY RESOURCES', sub: 'ENERGY & COAL RESOURCES' },
@@ -6832,6 +6832,110 @@
       }
     }
 
+    function formatDateShortMonthEn(iso) {
+      if (!iso) return '-';
+      const mShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const p = String(iso).slice(0, 10).split('-');
+      if (p.length !== 3) return iso;
+      return `${String(parseInt(p[2], 10)).padStart(2, '0')} ${mShort[parseInt(p[1], 10) - 1] || ''} ${p[0]}`;
+    }
+
+    function openEditRekapGrStatusModal(recId) {
+      const r = records.find(x => x.id === recId);
+      if (!r) return;
+      const m = ROMAN_MONTHS[new Date().getMonth()];
+      const y = new Date().getFullYear();
+      const suggestedGr = r.noGr || `____/GR/${r.pt || 'GEL'}/${m}/${y}`;
+      openUniversalModal(`
+        <div class="space-y-4">
+          <div class="flex items-center justify-between border-b pb-2.5">
+            <div>
+              <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-950 text-[10px] font-black">REKONSILIASI PVR MINGGUAN</span>
+              <h3 class="text-base font-black text-slate-900 mt-0.5">✎ Edit Tanggal, Nomor GR &amp; Status Pembayaran</h3>
+              <p class="text-xs text-slate-500">${escapeHtml(r.pt)} • ${escapeHtml(r.nama)} (${escapeHtml(r.rute)}) — <b>${formatRupiah(r.nominal)}</b></p>
+            </div>
+            <button type="button" onclick="closeUniversalModal()" class="text-slate-400 hover:text-slate-700 font-bold">✕</button>
+          </div>
+          <form onsubmit="saveRekapGrStatusEdit(event, '${r.id}')" class="space-y-3.5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Tanggal Order / Pengajuan *</label>
+                <input type="date" id="editRekapTanggalInput" required value="${escapeHtml(String(r.tanggalOrder || getTodayIso()).slice(0, 10))}" class="w-full h-10 px-3 text-xs border border-slate-300 rounded-xl bg-white font-semibold" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Status Pembayaran *</label>
+                <select id="editRekapStatusBayarSelect" class="w-full h-10 px-3 text-xs border border-slate-300 rounded-xl bg-white font-extrabold">
+                  <option value="UNPAID" ${r.statusBayar !== 'PAID' ? 'selected' : ''}>UNPAID (Wajib Buka PVR)</option>
+                  <option value="PAID" ${r.statusBayar === 'PAID' ? 'selected' : ''}>PAID (Lunas — Tidak Perlu Buka PVR Lagi)</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-slate-700">Nomor GR / PVR *</label>
+                <button type="button" onclick="setElVal('editRekapNoGrInput', '____/GR/${escapeHtml(r.pt || 'GEL')}/${m}/${y}')" class="text-[11px] font-extrabold text-blue-600 hover:underline">+ Pakai Template GR (${escapeHtml(r.pt || 'GEL')})</button>
+              </div>
+              <input type="text" id="editRekapNoGrInput" value="${escapeHtml(r.noGr || '')}" placeholder="${escapeHtml(suggestedGr)}" class="w-full h-10 px-3 text-xs border border-blue-300 rounded-xl bg-blue-50/40 font-mono font-black text-blue-950" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Catatan / Keterangan Tambahan</label>
+              <input type="text" id="editRekapKetInput" value="${escapeHtml(r.statusKet || '')}" placeholder="Opsional..." class="w-full h-10 px-3 text-xs border border-slate-300 rounded-xl bg-white" />
+            </div>
+            <label class="flex items-center gap-2 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-xs font-bold text-amber-950 cursor-pointer">
+              <input type="checkbox" id="editRekapApplySamePtUnpaid" class="w-4 h-4 accent-amber-600 rounded" />
+              <span>Terapkan Nomor GR &amp; Status ini ke semua item <b>UNPAID</b> milik <b>${escapeHtml(r.pt)}</b> yang sedang dicentang</span>
+            </label>
+            <div class="flex justify-end gap-2 pt-2">
+              <button type="button" onclick="closeUniversalModal()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold">Batal</button>
+              <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow">✓ Simpan Perubahan</button>
+            </div>
+          </form>
+        </div>
+      `);
+    }
+
+    function saveRekapGrStatusEdit(e, recId) {
+      e.preventDefault();
+      const r = records.find(x => x.id === recId);
+      if (!r) return;
+      const newDate = getElVal('editRekapTanggalInput', r.tanggalOrder);
+      const newStatus = getElVal('editRekapStatusBayarSelect', 'UNPAID');
+      const newGr = getElVal('editRekapNoGrInput', '').trim().toUpperCase();
+      const newKet = getElVal('editRekapKetInput', '').trim();
+      const applyChecked = Boolean(getEl('editRekapApplySamePtUnpaid')?.checked);
+
+      const updateOne = (item) => {
+        item.tanggalOrder = newDate;
+        item.statusBayar = newStatus;
+        item.noGr = newGr;
+        item.statusKet = newKet;
+        if (newStatus === 'PAID') {
+          selectedPvrRecordIds.delete(item.id);
+        }
+        item._updatedAt = Date.now();
+      };
+
+      updateOne(r);
+      if (applyChecked) {
+        records.forEach(item => {
+          if (item.id !== r.id && item.pt === r.pt && item.statusBayar !== 'PAID' && selectedPvrRecordIds.has(item.id)) {
+            updateOne(item);
+          }
+        });
+      }
+
+      saveStorage();
+      closeUniversalModal();
+      renderRekapTable();
+      renderPvrPreview(false);
+      showToast(
+        newStatus === 'PAID'
+          ? `Status diperbarui ke PAID (No. GR: ${newGr || '-'}) — tidak perlu dibuka PVR lagi.`
+          : `Data Tanggal & No. GR (${newGr || '-'}) berhasil diperbarui.`,
+        'success'
+      );
+    }
+
     function renderRekapTable() {
       const tbody = getEl('rekapTableBody');
       if (!tbody) return;
@@ -6845,6 +6949,11 @@
       const fTahun = getElVal('filterTahun', 'ALL');
       const fBulan = getElVal('filterBulan', 'ALL');
       const fExact = getElVal('filterTanggalExact', '');
+
+      // Bersihkan ID yang sudah PAID dari pilihan PVR agar yang sudah PAID tidak dibuka PVR lagi
+      records.forEach(r => {
+        if (r.statusBayar === 'PAID') selectedPvrRecordIds.delete(r.id);
+      });
 
       const filtered = records.filter(r => {
         const dt = String(r[fDateField] || r.tanggalOrder || '');
@@ -6867,46 +6976,71 @@
       const cardsBox = getEl('pvrReconcileCards');
       if (cardsBox) {
         const unpaidByPt = {};
+        const countByPt = {};
         records.filter(r => r.statusBayar !== 'PAID').forEach(r => {
           unpaidByPt[r.pt] = (unpaidByPt[r.pt] || 0) + (Number(r.nominal) || 0);
+          countByPt[r.pt] = (countByPt[r.pt] || 0) + 1;
         });
-        const ptKeys = Object.keys(unpaidByPt);
+        const ptKeys = Object.keys(unpaidByPt).sort();
         cardsBox.innerHTML = ptKeys.map(pt => `
-          <div onclick="setElVal('pvrPtSelect','${pt}');switchMainTab('pvr');" class="p-3 rounded-xl bg-white border border-blue-200 hover:border-blue-500 cursor-pointer shadow-2xs transition">
-            <div class="text-[11px] font-black text-blue-950">${pt}</div>
-            <div class="text-sm font-black text-rose-700 mt-0.5">${formatRupiah(unpaidByPt[pt])}</div>
+          <div onclick="openPtWeeklyPvrFromCard('${pt}')" class="p-3 rounded-xl bg-white border border-blue-200 hover:border-blue-600 cursor-pointer shadow-2xs transition">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-black text-blue-950">${pt}</span>
+              <span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[9.5px] font-extrabold">${countByPt[pt]} Item Wajib PVR</span>
+            </div>
+            <div class="text-sm font-black text-rose-700 mt-1">${formatRupiah(unpaidByPt[pt])}</div>
+            <div class="text-[10px] text-blue-600 font-bold mt-0.5">Klik untuk buka &amp; pilih item PVR →</div>
           </div>
-        `).join('') || `<div class="col-span-4 text-xs text-slate-500 italic">Semua pengajuan sudah PAID.</div>`;
+        `).join('') || `<div class="col-span-4 text-xs text-emerald-700 font-bold italic">✓ Semua pengajuan sudah PAID (Tidak ada antrian PVR minggu ini).</div>`;
       }
 
       tbody.innerHTML = filtered.map((r, i) => {
         const isUnpaid = r.statusBayar !== 'PAID';
-        const checked = selectedPvrRecordIds.has(r.id) ? 'checked' : '';
+        const checked = isUnpaid && selectedPvrRecordIds.has(r.id) ? 'checked' : '';
         return `
-          <tr class="hover:bg-slate-50">
+          <tr class="hover:bg-slate-50 ${isUnpaid ? '' : 'bg-emerald-50/25'}">
             <td class="py-2.5 px-2.5 text-center">
-              <input type="checkbox" ${checked} onchange="if(this.checked)selectedPvrRecordIds.add('${r.id}');else selectedPvrRecordIds.delete('${r.id}');setElText('selectedUnpaidCountBadge',selectedPvrRecordIds.size);" class="w-4 h-4 accent-blue-600 rounded" />
+              ${isUnpaid
+                ? `<input type="checkbox" ${checked} onchange="if(this.checked)selectedPvrRecordIds.add('${r.id}');else selectedPvrRecordIds.delete('${r.id}');setElText('selectedUnpaidCountBadge',selectedPvrRecordIds.size);" title="Pilih item UNPAID ini untuk diajukan PVR mingguan" class="w-4 h-4 accent-blue-600 rounded cursor-pointer" />`
+                : `<span title="Sudah PAID — Tidak perlu dibuka PVR lagi" class="text-emerald-600 font-black text-xs">✓</span>`
+              }
             </td>
             <td class="py-2.5 px-3 text-center font-bold">${i + 1}</td>
-            <td class="py-2.5 px-3">${formatDateShort(r.tanggalOrder)}</td>
+            <td class="py-2.5 px-3 whitespace-nowrap">${formatDateShort(r.tanggalOrder)}</td>
             <td class="py-2.5 px-3 font-mono font-bold">${escapeHtml(r.invoice)}</td>
             <td class="py-2.5 px-3 font-black text-blue-900">${escapeHtml(r.pt)} <span class="text-[10px] text-slate-500">(${escapeHtml(r.divisi || 'GA')})</span></td>
             <td class="py-2.5 px-3 font-bold">${escapeHtml(r.nama)}</td>
             <td class="py-2.5 px-3">${escapeHtml(r.keperluan)}</td>
             <td class="py-2.5 px-3"><b>${escapeHtml(r.maskapaiHotel)}</b><div class="text-[10px] text-slate-500">${escapeHtml(r.rute)}</div></td>
-            <td class="py-2.5 px-3">${formatDateShort(r.departDate)}</td>
+            <td class="py-2.5 px-3 whitespace-nowrap">${formatDateShort(r.departDate)}</td>
             <td class="py-2.5 px-3 text-[11px]">${escapeHtml(r.vendor)}<div class="text-slate-500">${escapeHtml(r.payment)}</div></td>
             <td class="py-2.5 px-3 text-right font-black">${formatRupiah(r.nominal)}</td>
-            <td class="py-2.5 px-3 font-mono text-[11px]">${escapeHtml(r.noGr || '-')}</td>
-            <td class="py-2.5 px-3 text-center">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-black ${isUnpaid ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}">${escapeHtml(r.statusBayar)}</span>
+            <td class="py-2.5 px-3 font-mono text-[11px]">
+              <button type="button" onclick="openEditRekapGrStatusModal('${r.id}')" class="text-left hover:underline font-bold ${r.noGr ? 'text-blue-900' : 'text-slate-400 italic'}" title="Klik untuk edit Tanggal & Nomor GR">
+                ${escapeHtml(r.noGr || '+ Isi No. GR')}
+              </button>
             </td>
             <td class="py-2.5 px-3 text-center">
-              <button type="button" onclick="markEntityDeleted('${r.id}');records=records.filter(x=>x.id!=='${r.id}');saveStorage();renderRekapTable();" class="px-2 py-1 rounded bg-rose-100 text-rose-800 text-[10px] font-bold">Hapus</button>
+              <button type="button" onclick="openEditRekapGrStatusModal('${r.id}')" class="px-2.5 py-1 rounded-full text-[10px] font-black cursor-pointer transition ${isUnpaid ? 'bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300' : 'bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-300'}" title="Klik untuk edit Tanggal, No. GR & ubah UNPAID ↔ PAID">
+                ${isUnpaid ? 'UNPAID • Wajib PVR' : 'PAID • Selesai PVR'}
+              </button>
+            </td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap">
+              <div class="flex items-center justify-center gap-1">
+                <button type="button" onclick="openEditRekapGrStatusModal('${r.id}')" class="px-2 py-1 rounded bg-amber-100 hover:bg-amber-200 text-amber-950 text-[10px] font-extrabold" title="Edit Tanggal, No. GR & Status PAID/UNPAID">✎ GR/Status</button>
+                <button type="button" onclick="markEntityDeleted('${r.id}');records=records.filter(x=>x.id!=='${r.id}');saveStorage();renderRekapTable();" class="px-2 py-1 rounded bg-rose-100 hover:bg-rose-200 text-rose-800 text-[10px] font-bold">Hapus</button>
+              </div>
             </td>
           </tr>
         `;
       }).join('') || `<tr><td colspan="14" class="py-8 text-center text-slate-400">Belum ada data transaksi ditemukan.</td></tr>`;
+    }
+
+    function openPtWeeklyPvrFromCard(ptCode) {
+      setElVal('pvrPtSelect', ptCode);
+      setElVal('pvrStatusFilter', 'UNPAID');
+      pvrFilterBySelectionOnly = false;
+      switchMainTab('pvr');
     }
 
     function resetRekapFilters() {
@@ -6931,12 +7065,13 @@
     }
 
     function openSelectedRecordsInPvr() {
-      if (!selectedPvrRecordIds.size) {
-        showToast('Centang minimal 1 item UNPAID terlebih dahulu.', 'warning');
+      const validSelected = records.filter(r => r.statusBayar !== 'PAID' && selectedPvrRecordIds.has(r.id));
+      if (!validSelected.length) {
+        showToast('Centang minimal 1 item UNPAID terlebih dahulu (item PAID tidak perlu dibuka PVR lagi).', 'warning');
         return;
       }
-      const firstRec = records.find(r => selectedPvrRecordIds.has(r.id));
-      if (firstRec) setElVal('pvrPtSelect', firstRec.pt);
+      setElVal('pvrPtSelect', validSelected[0].pt);
+      setElVal('pvrStatusFilter', 'UNPAID');
       pvrFilterBySelectionOnly = true;
       switchMainTab('pvr');
     }
@@ -6972,14 +7107,15 @@
       if (!getElVal('pvrSignReviewer')) setElVal('pvrSignReviewer', 'Eunike Priskila');
       if (!getElVal('pvrSignApprover')) setElVal('pvrSignApprover', 'Tony');
 
+      // Item yang sudah PAID tidak perlu dibuka PVR lagi kecuali user secara eksplisit memilih arsip PAID
       const ptItems = records.filter(r =>
         r.pt === pt &&
         (vFilter === 'ALL' || r.vendor === vFilter) &&
-        (sFilter === 'ALL' || r.statusBayar === sFilter) &&
+        (sFilter === 'ALL' ? r.statusBayar !== 'PAID' : r.statusBayar === sFilter) &&
         (dFilter === 'ALL' || (r.divisi || 'GA') === dFilter)
       );
 
-      const activeItems = pvrFilterBySelectionOnly && selectedPvrRecordIds.size
+      const activeItems = pvrFilterBySelectionOnly
         ? ptItems.filter(r => selectedPvrRecordIds.has(r.id))
         : ptItems;
 
@@ -6989,12 +7125,12 @@
         selBox.innerHTML = ptItems.map(r => `
           <label class="flex items-center justify-between gap-2 p-2 rounded-xl bg-white border border-amber-200 text-xs cursor-pointer">
             <span class="flex items-center gap-2 min-w-0">
-              <input type="checkbox" ${(!pvrFilterBySelectionOnly || selectedPvrRecordIds.has(r.id)) ? 'checked' : ''} onchange="pvrFilterBySelectionOnly=true;if(this.checked)selectedPvrRecordIds.add('${r.id}');else selectedPvrRecordIds.delete('${r.id}');renderPvrPreview(false);" class="accent-amber-600" />
-              <span class="font-bold truncate">${escapeHtml(r.nama)} — ${escapeHtml(r.rute)}</span>
+              <input type="checkbox" ${(!pvrFilterBySelectionOnly || selectedPvrRecordIds.has(r.id)) ? 'checked' : ''} onchange="if(!pvrFilterBySelectionOnly){ptItemsForInit('${pt}');}pvrFilterBySelectionOnly=true;if(this.checked)selectedPvrRecordIds.add('${r.id}');else selectedPvrRecordIds.delete('${r.id}');renderPvrPreview(false);" class="accent-amber-600" />
+              <span class="font-bold truncate">${escapeHtml(r.nama)} — ${escapeHtml(r.rute)} <span class="text-[10px] text-slate-400">(${formatDateShort(r.tanggalOrder)})</span></span>
             </span>
             <span class="font-black text-blue-900 shrink-0">${formatRupiah(r.nominal)}</span>
           </label>
-        `).join('') || `<p class="text-[11px] text-amber-900 italic">Tidak ada item untuk filter PT ini.</p>`;
+        `).join('') || `<p class="text-[11px] text-emerald-800 font-bold italic">✓ Tidak ada item UNPAID tersisa untuk PT ${escapeHtml(pt)}.</p>`;
       }
 
       setElText('docKepada', `Finance PT ${pt}`);
@@ -7011,10 +7147,14 @@
             <td class="text-right" contenteditable="true">Rp -</td>
             <td class="text-right font-bold pvr-line-amount" data-val="${Number(r.nominal) || 0}">${formatRupiahPvr(r.nominal)}</td>
           </tr>
-        `).join('') || `<tr><td colspan="6" class="text-center py-4 text-slate-400">Belum ada item pengajuan pada PVR ini.</td></tr>`;
+        `).join('') || `<tr><td colspan="6" class="text-center py-4 text-slate-400">Belum ada item UNPAID dipilih pada PVR ini.</td></tr>`;
       }
       recalcPvrSheetTotals();
       requestAnimationFrame(fitPvrSheetsToViewport);
+    }
+
+    function ptItemsForInit(pt) {
+      records.filter(r => r.pt === pt && r.statusBayar !== 'PAID').forEach(r => selectedPvrRecordIds.add(r.id));
     }
 
     function syncPvrMetaInputs() {
@@ -7084,37 +7224,387 @@
 
     function markCurrentPvrItemsAsPaid() {
       const pt = getElVal('pvrPtSelect', 'EPM');
+      const noPvrDoc = getElVal('pvrNoDoc', '').trim();
+      const tglPengajuan = getElVal('pvrTglPengajuan', getTodayIso());
       let count = 0;
       records.forEach(r => {
         if (r.pt === pt && r.statusBayar !== 'PAID' && (!pvrFilterBySelectionOnly || selectedPvrRecordIds.has(r.id))) {
           r.statusBayar = 'PAID';
+          if (noPvrDoc && !r.noGr) r.noGr = noPvrDoc;
+          if (tglPengajuan) r.tanggalOrder = tglPengajuan;
           r._updatedAt = Date.now();
+          selectedPvrRecordIds.delete(r.id);
           count++;
         }
       });
       saveStorage();
       renderRekapTable();
       renderPvrPreview(false);
-      showToast(`${count} item PVR PT ${pt} ditandai PAID (Lunas).`, 'success');
+      showToast(`${count} item PVR PT ${pt} ditandai PAID — otomatis keluar dari antrian PVR berikutnya.`, 'success');
     }
 
-    function exportCleanRekapExcel() {
-      if (typeof XLSX === 'undefined') return;
-      const rows = records.map((r, i) => ({
-        'No.': i + 1, 'Tanggal Order': r.tanggalOrder, 'Nomor Invoice': r.invoice, 'Payment Method': r.payment,
-        'PT': r.pt, 'Nama': r.nama, 'Keperluan': r.keperluan, 'Rute / Hotel': r.rute,
-        'Tanggal Berangkat': r.departDate, 'Maskapai / Hotel': r.maskapaiHotel, 'Vendor': r.vendor,
-        'Nominal': Number(r.nominal) || 0, 'Status Pengajuan': r.statusPengajuan, 'No. GR': r.noGr,
-        'Status Pembayaran': r.statusBayar, 'Estimasi MOVA': Number(r.mova) || 0
-      }));
-      const ws = XLSX.utils.json_to_sheet(rows);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'REKAP_TICKETING_GA');
-      XLSX.writeFile(wb, `Rekap_Ticketing_GA_GEL_${getTodayIso()}.xlsx`);
+    // =========================================================================
+    // EXPORT EXCEL REKAPITULASI 3 SHEET (SUMMARY REKAP + GA LAMPIRAN II + CORSEC LAMPIRAN I)
+    // =========================================================================
+    async function exportCleanRekapExcel() {
+      if (typeof ExcelJS === 'undefined') {
+        showToast('Library ExcelJS sedang dimuat, coba sesaat lagi.', 'warning');
+        return;
+      }
+
+      const wb = new ExcelJS.Workbook();
+      wb.creator = 'GA GEL — PT Global Energi Lestari';
+      wb.created = new Date();
+
+      const thinBorder = {
+        top: { style: 'thin', color: { argb: 'FF000000' } },
+        left: { style: 'thin', color: { argb: 'FF000000' } },
+        bottom: { style: 'thin', color: { argb: 'FF000000' } },
+        right: { style: 'thin', color: { argb: 'FF000000' } }
+      };
+
+      const gaRecords = records.filter(r => (r.divisi || 'GA') !== 'CORSEC');
+      const corsecRecords = records.filter(r => (r.divisi || 'GA') === 'CORSEC');
+
+      // 1. SHEET 1: SUMMARY REKAP
+      const wsSum = wb.addWorksheet('SUMMARY REKAP');
+      wsSum.mergeCells('A1:G1');
+      wsSum.getCell('A1').value = 'SUMMARY REKAPITULASI PEMBELIAN TIKET PESAWAT & HOTEL';
+      wsSum.getCell('A1').font = { name: 'Calibri', size: 13, bold: true };
+      wsSum.getCell('A1').alignment = { vertical: 'middle', horizontal: 'left' };
+
+      const sumHeaders = ['NO.', 'KODE PT', 'NAMA PERUSAHAAN', 'TOTAL ITEM', 'UNPAID (Rp)', 'PAID (Rp)', 'TOTAL REALISASI (Rp)'];
+      const sumHeaderRow = wsSum.getRow(3);
+      sumHeaderRow.height = 24;
+      sumHeaders.forEach((h, idx) => {
+        const cell = sumHeaderRow.getCell(idx + 1);
+        cell.value = h;
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF00B0F0' } };
+        cell.font = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FF000000' } };
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        cell.border = thinBorder;
+      });
+
+      const ptSummaryMap = {};
+      records.forEach(r => {
+        const code = String(r.pt || 'GEL').toUpperCase();
+        if (!ptSummaryMap[code]) {
+          ptSummaryMap[code] = {
+            code,
+            name: (PT_FULL_INFO[code]?.fullName || `PT. ${code}`).replace(/^PT\s+(?!\.)/i, 'PT. '),
+            count: 0,
+            unpaid: 0,
+            paid: 0,
+            total: 0
+          };
+        }
+        const nom = Number(r.nominal) || 0;
+        ptSummaryMap[code].count += 1;
+        if (r.statusBayar === 'PAID') ptSummaryMap[code].paid += nom;
+        else ptSummaryMap[code].unpaid += nom;
+        ptSummaryMap[code].total += nom;
+      });
+
+      const sortedPts = Object.values(ptSummaryMap).sort((a, b) => a.code.localeCompare(b.code));
+      let curSumRow = 4;
+      sortedPts.forEach((p, idx) => {
+        const row = wsSum.getRow(curSumRow);
+        row.getCell(1).value = idx + 1;
+        row.getCell(2).value = p.code;
+        row.getCell(3).value = p.name;
+        row.getCell(4).value = p.count;
+        row.getCell(5).value = p.unpaid;
+        row.getCell(6).value = p.paid;
+        row.getCell(7).value = p.total;
+
+        [1, 2, 4].forEach(c => { row.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' }; });
+        row.getCell(3).alignment = { horizontal: 'left', vertical: 'middle' };
+        [5, 6, 7].forEach(c => {
+          row.getCell(c).numFmt = '#,##0';
+          row.getCell(c).alignment = { horizontal: 'right', vertical: 'middle' };
+        });
+        for (let c = 1; c <= 7; c++) {
+          row.getCell(c).font = { name: 'Calibri', size: 11 };
+          row.getCell(c).border = thinBorder;
+        }
+        curSumRow++;
+      });
+
+      const endSumDataRow = Math.max(4, curSumRow - 1);
+      const totalSumRow = wsSum.getRow(curSumRow);
+      wsSum.mergeCells(`A${curSumRow}:C${curSumRow}`);
+      totalSumRow.getCell(1).value = 'TOTAL KESELURUHAN';
+      totalSumRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+      totalSumRow.getCell(4).value = sortedPts.length ? { formula: `SUM(D4:D${endSumDataRow})` } : 0;
+      totalSumRow.getCell(5).value = sortedPts.length ? { formula: `SUM(E4:E${endSumDataRow})` } : 0;
+      totalSumRow.getCell(6).value = sortedPts.length ? { formula: `SUM(F4:F${endSumDataRow})` } : 0;
+      totalSumRow.getCell(7).value = sortedPts.length ? { formula: `SUM(G4:G${endSumDataRow})` } : 0;
+      totalSumRow.getCell(4).alignment = { horizontal: 'center', vertical: 'middle' };
+      [5, 6, 7].forEach(c => {
+        totalSumRow.getCell(c).numFmt = '#,##0';
+        totalSumRow.getCell(c).alignment = { horizontal: 'right', vertical: 'middle' };
+      });
+      for (let c = 1; c <= 7; c++) {
+        totalSumRow.getCell(c).font = { name: 'Calibri', size: 11, bold: true };
+        totalSumRow.getCell(c).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9E1F2' } };
+        totalSumRow.getCell(c).border = thinBorder;
+      }
+      wsSum.columns = [
+        { width: 6 }, { width: 14 }, { width: 38 }, { width: 14 }, { width: 20 }, { width: 20 }, { width: 22 }
+      ];
+
+      // 2. SHEET 2: GA (LAMPIRAN II)
+      const wsGa = wb.addWorksheet('GA (LAMPIRAN II)');
+      wsGa.getCell('A1').value = 'General Affair';
+      wsGa.getCell('A1').font = { name: 'Calibri', size: 12, bold: true };
+      wsGa.mergeCells('A3:R3');
+      wsGa.getCell('A3').value = 'REALISASI PEMBELIAN TIKET & HOTEL';
+      wsGa.getCell('A3').font = { name: 'Calibri', size: 12, bold: true };
+      wsGa.getCell('A3').alignment = { horizontal: 'center', vertical: 'middle' };
+
+      const gaHeaders = [
+        'No.', 'Tanggal Order', 'Nomor Invoice', 'Payment Method', 'PT', 'Nama', 'Keperluan',
+        'Rute/ Hotel', 'Tanggal Penerbangan/ Ci-Co', 'Maskapai/ Hotel', 'Vendor', 'Nominal',
+        'Status Pengajuan', 'Tujuan Pembayaran', 'No. GR', 'Status Pembayaran', 'Status', 'Estimasi Pendapatan MOVA'
+      ];
+      const gaHeaderRow = wsGa.getRow(4);
+      gaHeaderRow.height = 26;
+      gaHeaders.forEach((h, idx) => {
+        const cell = gaHeaderRow.getCell(idx + 1);
+        cell.value = h;
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF00B0F0' } };
+        cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF000000' } };
+        cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+        cell.border = thinBorder;
+      });
+
+      let curGaRow = 5;
+      gaRecords.forEach((r, idx) => {
+        const row = wsGa.getRow(curGaRow);
+        const jadwalStr = r.returnDate && r.returnDate !== r.departDate
+          ? `${formatDateShortMonthEn(r.departDate)} - ${formatDateShortMonthEn(r.returnDate)}`
+          : formatDateShortMonthEn(r.departDate);
+        const ruteHotelStr = r.jenis === 'HOTEL'
+          ? `Hotel (${r.flightNo || 'Standard Room'} - 1 Kamar)`
+          : (r.rute2 ? `${r.rute} / ${r.rute2}` : (r.rute || '-'));
+
+        row.getCell(1).value = idx + 1;
+        row.getCell(2).value = formatDateShortMonthEn(r.tanggalOrder);
+        row.getCell(3).value = r.invoice || '-';
+        row.getCell(4).value = r.payment || 'DC BNI Pak Tony';
+        row.getCell(5).value = r.pt || 'GEL';
+        row.getCell(6).value = (r.passengers && r.passengers.length)
+          ? r.passengers.map(p => toTitleCaseName(p.name)).join(', ')
+          : toTitleCaseName(String(r.nama || '').replace(/(MR|MRS|MS)\.?\s+/gi, ''));
+        row.getCell(7).value = r.keperluan || 'Perdin';
+        row.getCell(8).value = ruteHotelStr;
+        row.getCell(9).value = jadwalStr;
+        row.getCell(10).value = r.maskapaiHotel || '-';
+        row.getCell(11).value = r.vendor || 'Traveloka';
+        row.getCell(12).value = Number(r.nominal) || 0;
+        row.getCell(13).value = r.statusPengajuan || 'Sudah Diajukan';
+        row.getCell(14).value = r.tujuan || r.payment || 'DC BNI Pak Tony';
+        row.getCell(15).value = r.noGr || '';
+        row.getCell(16).value = r.statusBayar || 'UNPAID';
+        row.getCell(17).value = r.statusKet || '';
+        row.getCell(18).value = Number(r.mova) || 0;
+
+        [1, 2, 3, 5, 9, 11, 13, 15, 16].forEach(c => {
+          row.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' };
+        });
+        [12, 18].forEach(c => {
+          row.getCell(c).numFmt = '#,##0';
+          row.getCell(c).alignment = { horizontal: 'right', vertical: 'middle' };
+        });
+        for (let c = 1; c <= 18; c++) {
+          row.getCell(c).font = { name: 'Calibri', size: 10 };
+          row.getCell(c).border = thinBorder;
+        }
+        curGaRow++;
+      });
+
+      const endGaDataRow = Math.max(5, curGaRow - 1);
+      const totalGaRow = wsGa.getRow(curGaRow);
+      wsGa.mergeCells(`A${curGaRow}:K${curGaRow}`);
+      totalGaRow.getCell(1).value = 'TOTAL KESELURUHAN';
+      totalGaRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+      totalGaRow.getCell(12).value = gaRecords.length ? { formula: `SUM(L5:L${endGaDataRow})` } : 0;
+      totalGaRow.getCell(18).value = gaRecords.length ? { formula: `SUM(R5:R${endGaDataRow})` } : 0;
+      [12, 18].forEach(c => {
+        totalGaRow.getCell(c).numFmt = '#,##0';
+        totalGaRow.getCell(c).alignment = { horizontal: 'right', vertical: 'middle' };
+      });
+      for (let c = 1; c <= 18; c++) {
+        totalGaRow.getCell(c).font = { name: 'Calibri', size: 10, bold: true };
+        totalGaRow.getCell(c).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9E1F2' } };
+        totalGaRow.getCell(c).border = thinBorder;
+      }
+      wsGa.columns = [
+        { width: 5 }, { width: 14 }, { width: 16 }, { width: 20 }, { width: 10 }, { width: 32 },
+        { width: 15 }, { width: 26 }, { width: 24 }, { width: 28 }, { width: 13 }, { width: 16 },
+        { width: 18 }, { width: 20 }, { width: 22 }, { width: 18 }, { width: 18 }, { width: 22 }
+      ];
+
+      // 3. SHEET 3: CORSEC (LAMPIRAN I)
+      const wsCor = wb.addWorksheet('CORSEC (LAMPIRAN I)');
+      wsCor.getCell('A1').value = 'CORSEC';
+      wsCor.getCell('A1').font = { name: 'Calibri', size: 12, bold: true };
+      const corHeaders = [
+        'No', 'TANGGAL ORDER', 'ISSUE TIME', 'KODE', 'PLATFORM', 'TUJUAN PEMBAYARAN',
+        'REQUEST BY', 'COMPANY I.C', 'GUEST NAME', 'DESCRIPTION', 'DEPART DATE',
+        'RETURN DATE', 'AMOUNT', 'NO. GR', 'STATUS PEMBAYARAN'
+      ];
+      const corHeaderRow = wsCor.getRow(4);
+      corHeaderRow.height = 24;
+      corHeaders.forEach((h, idx) => {
+        const cell = corHeaderRow.getCell(idx + 1);
+        cell.value = h;
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9E1F2' } };
+        cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF000000' } };
+        cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+        cell.border = thinBorder;
+      });
+
+      corsecRecords.forEach((r, idx) => {
+        const row = wsCor.getRow(5 + idx);
+        row.getCell(1).value = idx + 1;
+        row.getCell(2).value = formatDateShortMonthEn(r.tanggalOrder);
+        row.getCell(3).value = r.issueTime || '11:00';
+        row.getCell(4).value = r.invoice || '-';
+        row.getCell(5).value = r.vendor || 'Traveloka';
+        row.getCell(6).value = r.tujuan || r.payment || 'DC BNI Pak Tony';
+        row.getCell(7).value = r.requestBy || '-';
+        row.getCell(8).value = r.pt || 'GEL';
+        row.getCell(9).value = r.nama || '-';
+        row.getCell(10).value = `${r.maskapaiHotel || ''} (${r.rute || '-'})`;
+        row.getCell(11).value = formatDateShortMonthEn(r.departDate);
+        row.getCell(12).value = r.returnDate ? formatDateShortMonthEn(r.returnDate) : '-';
+        row.getCell(13).value = Number(r.nominal) || 0;
+        row.getCell(14).value = r.noGr || '';
+        row.getCell(15).value = r.statusBayar || 'UNPAID';
+        row.getCell(13).numFmt = '#,##0';
+        row.getCell(13).alignment = { horizontal: 'right', vertical: 'middle' };
+        for (let c = 1; c <= 15; c++) {
+          row.getCell(c).font = { name: 'Calibri', size: 10 };
+          row.getCell(c).border = thinBorder;
+        }
+      });
+      wsCor.columns = [
+        { width: 5 }, { width: 14 }, { width: 12 }, { width: 14 }, { width: 16 }, { width: 20 },
+        { width: 22 }, { width: 14 }, { width: 30 }, { width: 36 }, { width: 14 },
+        { width: 14 }, { width: 16 }, { width: 22 }, { width: 18 }
+      ];
+
+      const buffer = await wb.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `REKAPITULASI_TIKET_HOTEL_${getTodayIso()}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      showToast('Export Excel Rekapitulasi (3 Sheet: Summary, GA Lampiran II, CORSEC Lampiran I) berhasil!', 'success');
     }
 
-    function exportSinglePtPvrExcel() { exportCleanRekapExcel(); }
-    function exportAllPtsPvrExcel() { exportCleanRekapExcel(); }
+    function exportSinglePtPvrExcel() {
+      const pt = getElVal('pvrPtSelect', 'EPM');
+      exportPtPvrExcelSheets([pt], `PVR_${pt}_${getTodayIso()}.xlsx`);
+    }
+
+    function exportAllPtsPvrExcel() {
+      const unpaidPts = Array.from(new Set(records.filter(r => r.statusBayar !== 'PAID').map(r => r.pt)));
+      if (!unpaidPts.length) {
+        showToast('Tidak ada item UNPAID untuk dibuat PVR.', 'info');
+        return;
+      }
+      exportPtPvrExcelSheets(unpaidPts, `PVR_SEMUA_PT_UNPAID_${getTodayIso()}.xlsx`);
+    }
+
+    async function exportPtPvrExcelSheets(ptList, fileName) {
+      if (typeof ExcelJS === 'undefined') return;
+      const wb = new ExcelJS.Workbook();
+      const thinBorder = {
+        top: { style: 'thin', color: { argb: 'FF000000' } },
+        left: { style: 'thin', color: { argb: 'FF000000' } },
+        bottom: { style: 'thin', color: { argb: 'FF000000' } },
+        right: { style: 'thin', color: { argb: 'FF000000' } }
+      };
+      const m = ROMAN_MONTHS[new Date().getMonth()];
+      const y = new Date().getFullYear();
+
+      ptList.forEach(pt => {
+        const ws = wb.addWorksheet(`PVR_${pt}`);
+        const info = PT_FULL_INFO[pt] || { fullName: `PT. ${pt}` };
+        const items = records.filter(r =>
+          r.pt === pt &&
+          r.statusBayar !== 'PAID' &&
+          (!pvrFilterBySelectionOnly || selectedPvrRecordIds.has(r.id))
+        );
+        ws.getCell('A1').value = info.fullName;
+        ws.getCell('A1').font = { bold: true, size: 13 };
+        ws.mergeCells('A3:F3');
+        ws.getCell('A3').value = 'PENGAJUAN PVR (PAYMENT VOUCHER REQUEST)';
+        ws.getCell('A3').font = { bold: true, size: 12, underline: true };
+        ws.getCell('A3').alignment = { horizontal: 'center' };
+        ws.mergeCells('A4:F4');
+        ws.getCell('A4').value = `NO : ${getElVal('pvrNoDoc') || `${pt}/GA/GR-____/${m}/${y}`}`;
+        ws.getCell('A4').font = { bold: true, size: 11 };
+        ws.getCell('A4').alignment = { horizontal: 'center' };
+
+        ws.getCell('A6').value = 'Kepada'; ws.getCell('B6').value = `: Finance PT ${pt}`;
+        ws.getCell('A7').value = 'Dari'; ws.getCell('B7').value = `: ${getElVal('pvrSignMaker', 'Eliza Putri Nadya')}`;
+        ws.getCell('A8').value = 'Tanggal'; ws.getCell('B8').value = `: ${formatDateIndo(getElVal('pvrTglPengajuan', getTodayIso()))}`;
+        ws.getCell('A9').value = 'Due Date'; ws.getCell('B9').value = `: ${formatDateIndo(getElVal('pvrDueDate', addDaysIso(getTodayIso(), 14)))}`;
+
+        const hdr = ws.getRow(11);
+        ['NO.', 'KETERANGAN', 'QUANTITY', 'HARGA', 'ADJUSTMENT', 'JUMLAH'].forEach((h, i) => {
+          const c = hdr.getCell(i + 1);
+          c.value = h;
+          c.font = { bold: true };
+          c.alignment = { horizontal: 'center', vertical: 'middle' };
+          c.border = thinBorder;
+        });
+
+        let rIdx = 12;
+        items.forEach((it, i) => {
+          const row = ws.getRow(rIdx);
+          row.getCell(1).value = i + 1;
+          row.getCell(2).value = it.pvrKeterangan || `${it.invoice} - Biaya ${it.jenis} a/n ${it.nama} (${it.rute})`;
+          row.getCell(3).value = computeRecordPvrQuantity(it);
+          row.getCell(4).value = Number(it.nominal) || 0;
+          row.getCell(5).value = 0;
+          row.getCell(6).value = Number(it.nominal) || 0;
+          row.getCell(1).alignment = { horizontal: 'center', vertical: 'top' };
+          row.getCell(2).alignment = { wrapText: true, vertical: 'top' };
+          row.getCell(3).alignment = { horizontal: 'center', vertical: 'top' };
+          [4, 5, 6].forEach(col => { row.getCell(col).numFmt = '#,##0'; row.getCell(col).alignment = { horizontal: 'right', vertical: 'top' }; });
+          for (let col = 1; col <= 6; col++) row.getCell(col).border = thinBorder;
+          rIdx++;
+        });
+
+        const endItemRow = Math.max(12, rIdx - 1);
+        const totRow = ws.getRow(rIdx);
+        ws.mergeCells(`A${rIdx}:E${rIdx}`);
+        totRow.getCell(1).value = 'GRAND TOTAL';
+        totRow.getCell(1).font = { bold: true };
+        totRow.getCell(1).alignment = { horizontal: 'center' };
+        totRow.getCell(6).value = items.length ? { formula: `SUM(F12:F${endItemRow})` } : 0;
+        totRow.getCell(6).font = { bold: true };
+        totRow.getCell(6).numFmt = '#,##0';
+        for (let col = 1; col <= 6; col++) totRow.getCell(col).border = thinBorder;
+
+        ws.columns = [{ width: 6 }, { width: 58 }, { width: 12 }, { width: 16 }, { width: 14 }, { width: 18 }];
+      });
+
+      const buf = await wb.xlsx.writeBuffer();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      showToast(`File ${fileName} berhasil diunduh!`, 'success');
+    }
 
     function backupJsonData() {
       const dataStr = localStorage.getItem(STORAGE_KEY) || '{}';
